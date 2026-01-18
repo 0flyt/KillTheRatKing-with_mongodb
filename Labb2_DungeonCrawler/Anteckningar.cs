@@ -8,7 +8,7 @@ namespace Labb2_DungeonCrawler;
 
 
 
-
+//Hej
 
 
 //Gör en Character-klass för properties som enemy och player har gemensamt
