@@ -127,6 +127,7 @@ public abstract class GameLoop:LevelElement
                         }
                     }
                     currentGameState.CurrentState = LevelData.Elements;
+                    currentGameState.MessageLog = currentMessageLog;
                 } while (player.HP > 0);
 
                 if (player.HP <= 0)
