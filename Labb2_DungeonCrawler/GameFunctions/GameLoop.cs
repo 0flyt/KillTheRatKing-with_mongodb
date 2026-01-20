@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Media;
+using Labb2_DungeonCrawler.State;
 
 namespace Labb2_DungeonCrawler;
 
@@ -14,6 +15,7 @@ public abstract class GameLoop:LevelElement
     {
         SoundPlayer musicPlayer = new SoundPlayer("ProjectFiles\\09. Björn Petersson - Uppenbarelse.wav");
         musicPlayer.PlayLooping();
+        var currentGameState = new GameState();
         while (true)
         {
             bool isAlive = true;
@@ -120,6 +122,7 @@ public abstract class GameLoop:LevelElement
                             element.Draw();
                         }
                     }
+                    currentGameState.CurrentState = LevelData.Elements;
                 } while (player.HP > 0);
 
                 if (player.HP <= 0)

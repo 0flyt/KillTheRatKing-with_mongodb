@@ -1,28 +1,4 @@
-﻿---G---
+﻿TODO
 
-Save and quit
-	Direkt från en level
-		Övergripande statehantering
-			skicka till databasen när man sparar
-			sparar bara state till databasen
-	Behövs en loadfunktion när man startar spelet
-			
-
-Lägg till klass
-	warrior, priest osv..
-		klasserna ska hämtas från en egen collection i MongoDB
-			om man uppdaterar collectionen ska spelet också uppdateras
-	behövs bara synas vilken klass man valt
-
-
----VG---
-
-Flera olika saves
-	New player
-	Load game
-		Dör man försvinner saven
-
-Meddelandelogg
-	Logg som är bunden till en save
-		läggs bara på nytt, inget tas bort
-	
+Möjlighet att spela utan musik
+(Volym på musiken)

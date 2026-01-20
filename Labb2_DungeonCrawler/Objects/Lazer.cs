@@ -15,5 +15,4 @@ public class Lazer : LevelElement
         MyColor = ConsoleColor.Magenta;
         AttackDice = new Dice(0, 0, 20);
     }
-
 }
