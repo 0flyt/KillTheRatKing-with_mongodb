@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Labb2_DungeonCrawler.Log;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -20,7 +21,7 @@ public class TheKingsTail : Enemy
         DefenceDice = new Dice(20, 20, 20);
         HP = 200;
     }
-    public override void Update(Player player)
+    public override void Update(Player player, string logMessage, MessageLog messageLog)
     {
         this.lifeTime--;
         if (lifeTime <= 0)
@@ -29,7 +30,7 @@ public class TheKingsTail : Enemy
             LevelData.Elements.Remove(this);
         }
     }
-    public static void AddRatTails(int random0To3, int y, int x, Player player)
+    public static void AddRatTails(int random0To3, int y, int x, Player player, string logMessage, MessageLog messageLog)
     {
         switch (random0To3)
         {
@@ -40,7 +41,7 @@ public class TheKingsTail : Enemy
                     if (tail.IsSpaceAvailable()) LevelData.Elements.Add(tail);
                     else
                     {
-                        tail.CollideAndConcequences(player);
+                        tail.CollideAndConcequences(player, logMessage, messageLog);
                         break;
                     }
                 }
@@ -50,7 +51,7 @@ public class TheKingsTail : Enemy
                     if (tail2.IsSpaceAvailable()) LevelData.Elements.Add(tail2);
                     else
                     {
-                        tail2.CollideAndConcequences(player);
+                        tail2.CollideAndConcequences(player, logMessage, messageLog);
                         break;
                     }
                 }
@@ -62,7 +63,7 @@ public class TheKingsTail : Enemy
                     if (tail.IsSpaceAvailable()) LevelData.Elements.Add(tail);
                     else
                     {
-                        tail.CollideAndConcequences(player);
+                        tail.CollideAndConcequences(player, logMessage, messageLog);
                         break;
                     }
                 }
@@ -72,7 +73,7 @@ public class TheKingsTail : Enemy
                     if (tail2.IsSpaceAvailable()) LevelData.Elements.Add(tail2);
                     else
                     {
-                        tail2.CollideAndConcequences(player);
+                        tail2.CollideAndConcequences(player, logMessage, messageLog);
                         break;
                     }
                 }
@@ -84,7 +85,7 @@ public class TheKingsTail : Enemy
                     if (tail.IsSpaceAvailable()) LevelData.Elements.Add(tail);
                     else
                     {
-                        tail.CollideAndConcequences(player);
+                        tail.CollideAndConcequences(player, logMessage, messageLog);
                         break;
                     }
                 }
@@ -94,7 +95,7 @@ public class TheKingsTail : Enemy
                     if (tail2.IsSpaceAvailable()) LevelData.Elements.Add(tail2);
                     else
                     {
-                        tail2.CollideAndConcequences(player);
+                        tail2.CollideAndConcequences(player, logMessage, messageLog);
                         break;
                     }
                 }
@@ -106,7 +107,7 @@ public class TheKingsTail : Enemy
                     if (tail.IsSpaceAvailable()) LevelData.Elements.Add(tail);
                     else
                     {
-                        tail.CollideAndConcequences(player);
+                        tail.CollideAndConcequences(player, logMessage, messageLog);
                         break;
                     }
                 }
@@ -116,7 +117,7 @@ public class TheKingsTail : Enemy
                     if (tail2.IsSpaceAvailable()) LevelData.Elements.Add(tail2);
                     else
                     {
-                        tail2.CollideAndConcequences(player);
+                        tail2.CollideAndConcequences(player, logMessage, messageLog);
                         break;
                     }
                 }

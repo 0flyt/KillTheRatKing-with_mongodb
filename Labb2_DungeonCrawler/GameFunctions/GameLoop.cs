@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Media;
 using Labb2_DungeonCrawler.State;
+using Labb2_DungeonCrawler.Log;
 
 namespace Labb2_DungeonCrawler;
 
@@ -16,6 +17,8 @@ public abstract class GameLoop:LevelElement
         SoundPlayer musicPlayer = new SoundPlayer("ProjectFiles\\09. Björn Petersson - Uppenbarelse.wav");
         musicPlayer.PlayLooping();
         var currentGameState = new GameState();
+        var currentMessageLog = new MessageLog();
+        string logMessage = string.Empty;
         while (true)
         {
             bool isAlive = true;
@@ -51,7 +54,8 @@ public abstract class GameLoop:LevelElement
                 }
                 player.Name = userName; 
                 Console.Clear();
-                player.PrintUnitInfo();
+                logMessage = player.PrintUnitInfo();
+                currentMessageLog.MyLog.Add(logMessage);
                 Graphics.WriteInfo();
                 foreach (var wall in walls ?? Enumerable.Empty<Wall>())
                 {
@@ -82,7 +86,7 @@ public abstract class GameLoop:LevelElement
                         savedHP = player.HP;
                         break;
                     }
-                    if(player.playerDirection.ContainsKey(menuChoice.Key) || menuChoice.Key == ConsoleKey.Z) player.Update(menuChoice);
+                    if(player.playerDirection.ContainsKey(menuChoice.Key) || menuChoice.Key == ConsoleKey.Z) player.Update(menuChoice, logMessage, currentMessageLog);
                     foreach (var wall in walls)
                     {
                         wall.Update(player);
@@ -91,7 +95,7 @@ public abstract class GameLoop:LevelElement
                     foreach (var enemy in enemys)
                     {
                         enemy.Erase();
-                        enemy.Update(player);
+                        enemy.Update(player, logMessage, currentMessageLog);
                     }
                     var deadRats = LevelData.Elements?.OfType<Rat>().Where(e => e.HP <= 0).ToList() ?? new List<Rat>();
                     foreach (var rat in deadRats)
@@ -123,6 +127,7 @@ public abstract class GameLoop:LevelElement
                         }
                     }
                     currentGameState.CurrentState = LevelData.Elements;
+                    currentGameState.MessageLog = currentMessageLog;
                 } while (player.HP > 0);
 
                 if (player.HP <= 0)

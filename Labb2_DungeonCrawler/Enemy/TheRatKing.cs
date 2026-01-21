@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Labb2_DungeonCrawler.Log;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,7 +24,7 @@ public class TheRatKing : Enemy
         
     }
     
-    public override void Update(Player player)
+    public override void Update(Player player, string logMessage, MessageLog messageLog)
     {
         int move = random.Next(4);
         this.TurnsPlayed++;
@@ -36,7 +37,7 @@ public class TheRatKing : Enemy
                     if (IsSpaceAvailable()) break;
                     else
                     {
-                        CollideAndConcequences(player);
+                        CollideAndConcequences(player, logMessage, messageLog);
                         xCordinate++;
                         break;
                     }
@@ -45,7 +46,7 @@ public class TheRatKing : Enemy
                     if (IsSpaceAvailable()) break;
                     else
                     {
-                        CollideAndConcequences(player);
+                        CollideAndConcequences(player, logMessage, messageLog);
                         xCordinate--;
                         break;
                     }
@@ -54,7 +55,7 @@ public class TheRatKing : Enemy
                     if (IsSpaceAvailable()) break;
                     else
                     {
-                        CollideAndConcequences(player);
+                        CollideAndConcequences(player, logMessage, messageLog);
                         yCordinate++;
                         break;
                     }
@@ -63,7 +64,7 @@ public class TheRatKing : Enemy
                     if (IsSpaceAvailable()) break;
                     else
                     {
-                        CollideAndConcequences(player);
+                        CollideAndConcequences(player, logMessage, messageLog);
                         yCordinate--;
                         break;
                     }
@@ -71,7 +72,7 @@ public class TheRatKing : Enemy
             }
             if (TurnsPlayed % 3 == 0 && HP > 0)
             {
-               TheKingsTail.AddRatTails(move, yCordinate, xCordinate, player);
+               TheKingsTail.AddRatTails(move, yCordinate, xCordinate, player, logMessage, messageLog);
             }
         }
     }

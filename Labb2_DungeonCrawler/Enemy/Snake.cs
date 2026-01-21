@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Labb2_DungeonCrawler.Log;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,7 +58,7 @@ public class Snake : Enemy
 
     }
 
-    public override void Update(Player player)
+    public override void Update(Player player, string logMessage, MessageLog messageLog)
     {
         if (GetDistanceTo(player) < 2)
         {

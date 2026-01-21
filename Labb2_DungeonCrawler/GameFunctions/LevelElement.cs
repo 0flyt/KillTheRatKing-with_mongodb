@@ -1,5 +1,6 @@
 ﻿using Labb2_DungeonCrawler;
 using Labb2_DungeonCrawler.GameFunctions;
+using Labb2_DungeonCrawler.Log;
 
 
 
@@ -17,7 +18,10 @@ public abstract class LevelElement
     public int HP { get; set; }
 
 
-    public virtual void PrintUnitInfo() { }
+    public virtual string PrintUnitInfo() 
+    {
+        return "";
+    }
     public static void LevelChoice()
     {
         ConsoleKeyInfo userChoice;
@@ -112,7 +116,7 @@ public abstract class LevelElement
         return LevelData.Elements != null &&
                !LevelData.Elements.Any(k => k != this && k.yCordinate == targetSpace.YCord && k.xCordinate == targetSpace.XCord);
     }
-    public void CollideAndConcequences(Player player)
+    public void CollideAndConcequences(Player player, string logMessage, MessageLog messageLog)
     {
         var collider = this.GetCollider();
         if (collider is not Wall && !(collider is Enemy && this is Enemy))
@@ -121,10 +125,12 @@ public abstract class LevelElement
             Console.Write(new string(' ', Console.WindowWidth));
             Console.Write(new string(' ', Console.WindowWidth));
             Console.SetCursorPosition(0, 1);
-            PrintFightresult(Fight(collider), collider, player);
-            if (collider.HP > 0) collider.PrintFightresult(collider.Fight(this), this, player);
-            this.PrintUnitInfo();
-            collider.PrintUnitInfo();
+            PrintFightresult(Fight(collider), collider, player, logMessage, messageLog);
+            if (collider.HP > 0) collider.PrintFightresult(collider.Fight(this), this, player, logMessage, messageLog);
+            logMessage = this.PrintUnitInfo();
+            messageLog.MyLog.Add(logMessage);
+            logMessage = collider.PrintUnitInfo();
+            messageLog.MyLog.Add(logMessage);
         }
     }
     public LevelElement? GetCollider()
@@ -156,38 +162,45 @@ public abstract class LevelElement
         }
         else return -1;
     }
-    public void PrintFightresult(int fightreturn, LevelElement enemy, Player player)
+    public void PrintFightresult(int fightreturn, LevelElement enemy, Player player, string logMessage, MessageLog messageLog)
     {
         if (enemy is TheKingsTail)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"{player.Name} attacked the Kings tail and it had no effect. You can't damage the tail");
+            logMessage = $"{player.Name} attacked the Kings tail and it had no effect. You can't damage the tail";
+            Console.WriteLine(logMessage);
         }
         else if (enemy is Lazer)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"{this.Name} attacked the lazer and it had no effect. You can't damage the lazer");
+            logMessage = $"{this.Name} attacked the lazer and it had no effect. You can't damage the lazer";
+            Console.WriteLine(logMessage);
         }
         else if (fightreturn != -1 && this is Lazer)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{player.Name} used {this.Name} on {enemy.Name} with {this.AttackDice} attack and {enemy.Name} defended with {enemy.DefenceDice}. Attack was successfull and did {fightreturn} damage");
+            logMessage = $"{player.Name} used {this.Name} on {enemy.Name} with {this.AttackDice} attack and {enemy.Name} defended with {enemy.DefenceDice}. Attack was successfull and did {fightreturn} damage";
+            Console.WriteLine(logMessage);
         }
         else if (fightreturn != -1)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{this.Name} attacked {enemy.Name} with {this.AttackDice} and {enemy.Name} defended with {enemy.DefenceDice}. Attack was successfull and did {fightreturn} damage");
+            logMessage = $"{this.Name} attacked {enemy.Name} with {this.AttackDice} and {enemy.Name} defended with {enemy.DefenceDice}. Attack was successfull and did {fightreturn} damage";
+            Console.WriteLine(logMessage);
         }
         else if (this is Lazer)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"{player.Name} used {this.Name} on {enemy.Name} with {this.AttackDice} attack and {enemy.Name} defended with {enemy.DefenceDice}. Attack failed and did no damage");
+            logMessage = $"{player.Name} used {this.Name} on {enemy.Name} with {this.AttackDice} attack and {enemy.Name} defended with {enemy.DefenceDice}. Attack failed and did no damage";
+            Console.WriteLine(logMessage);
         }
         else
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"{this.Name} attacked {enemy.Name} with {this.AttackDice} and {enemy.Name} defended with {enemy.DefenceDice}. Attack failed and did no damage");
+            logMessage = $"{this.Name} attacked {enemy.Name} with {this.AttackDice} and {enemy.Name} defended with {enemy.DefenceDice}. Attack failed and did no damage";
+            Console.WriteLine(logMessage);
         }
+        messageLog.MyLog.Add(logMessage);
     }
 
 

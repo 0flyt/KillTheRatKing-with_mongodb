@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Labb2_DungeonCrawler.Log;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,7 @@ public class Rat : Enemy
         MyColor = ConsoleColor.Red;
     }
 
-    public override void Update(Player player)
+    public override void Update(Player player, string logMessage, MessageLog messageLog)
     {
         int move = random.Next(4);
         switch(move)
@@ -30,7 +31,7 @@ public class Rat : Enemy
                 if (IsSpaceAvailable()) break;
                 else
                 {
-                    CollideAndConcequences(player);
+                    CollideAndConcequences(player, logMessage, messageLog);
                     xCordinate++;
                     break;
                 }
@@ -39,7 +40,7 @@ public class Rat : Enemy
                 if (IsSpaceAvailable()) break;
                 else
                 {
-                    CollideAndConcequences(player);
+                    CollideAndConcequences(player, logMessage, messageLog);
                     xCordinate--;
                     break;
                 }
@@ -48,7 +49,7 @@ public class Rat : Enemy
                 if (IsSpaceAvailable()) break;
                 else
                 {
-                    CollideAndConcequences(player);
+                    CollideAndConcequences(player, logMessage, messageLog);
                     yCordinate++;
                     break;
                 }
@@ -57,7 +58,7 @@ public class Rat : Enemy
                 if (IsSpaceAvailable()) break;
                 else
                 {
-                    CollideAndConcequences(player);
+                    CollideAndConcequences(player, logMessage, messageLog);
                     yCordinate--;
                     break;
                 }
