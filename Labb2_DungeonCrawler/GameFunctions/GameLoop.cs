@@ -17,7 +17,6 @@ public abstract class GameLoop:LevelElement
         SoundPlayer musicPlayer = new SoundPlayer("ProjectFiles\\09. Björn Petersson - Uppenbarelse.wav");
         musicPlayer.PlayLooping();
         var currentGameState = new GameState();
-        var currentMessageLog = new MessageLog();
         string logMessage = string.Empty;
         while (true)
         {
@@ -29,20 +28,23 @@ public abstract class GameLoop:LevelElement
             string userName = Graphics.WriteStartScreen();
             while(true)
             {
-                LevelData.Elements?.Clear();
+                //LevelData.Elements?.Clear();
+                currentGameState.CurrentState?.Clear();
                 Graphics.WriteLevelSelect(userName);
-                LevelChoice();
-                var player = LevelData.Elements?.OfType<Player>().FirstOrDefault();
+                LevelChoice(currentGameState);
+                //var player = LevelData.Elements?.OfType<Player>().FirstOrDefault();
+                var player = currentGameState.CurrentState?.OfType<Player>().FirstOrDefault();
                 if (player == null)
                 {
                     throw new ArgumentNullException("no player found, add a player to the map");
                 }
-                var enemys = LevelData.Elements?.OfType<Enemy>().ToList();
+                //var enemys = LevelData.Elements?.OfType<Enemy>().ToList();
+                var enemys = currentGameState.CurrentState?.OfType<Enemy>().ToList();
                 if (enemys == null)
                 {
                     throw new ArgumentNullException("no enemies found, add enemies to the map");
                 }
-                var walls = LevelData.Elements?.OfType<Wall>().ToList();
+                var walls = currentGameState.CurrentState?.OfType<Wall>().ToList();
                 if (walls == null)
                 {
                     throw new ArgumentNullException("no walls found, add walls to the map");
@@ -55,14 +57,14 @@ public abstract class GameLoop:LevelElement
                 player.Name = userName; 
                 Console.Clear();
                 logMessage = player.PrintUnitInfo();
-                currentMessageLog.MyLog.Add(logMessage);
+                currentGameState.MessageLog.MyLog.Add(logMessage);
                 Graphics.WriteInfo();
                 foreach (var wall in walls ?? Enumerable.Empty<Wall>())
                 {
                     wall.Update(player);
                     if (wall.IsToBeDrawn()) wall.Draw();
                 }
-                foreach (var element in LevelData.Elements ?? Enumerable.Empty<LevelElement>())
+                foreach (var element in currentGameState.CurrentState ?? Enumerable.Empty<LevelElement>())
                 {
                     if (element is Player)
                     {
@@ -76,8 +78,8 @@ public abstract class GameLoop:LevelElement
                 do
                 {
                     Graphics.WriteInfo();
-                    enemys = LevelData.Elements?.OfType<Enemy>().ToList() ?? new List<Enemy>();
-                    walls = LevelData.Elements?.OfType<Wall>().ToList() ?? new List<Wall>();
+                    enemys = currentGameState.CurrentState?.OfType<Enemy>().ToList() ?? new List<Enemy>();
+                    walls = currentGameState.CurrentState?.OfType<Wall>().ToList() ?? new List<Wall>();
                     menuChoice = Console.ReadKey(true);                                       
                     if (menuChoice.Key == ConsoleKey.Escape)
                     {
@@ -86,7 +88,8 @@ public abstract class GameLoop:LevelElement
                         savedHP = player.HP;
                         break;
                     }
-                    if(player.playerDirection.ContainsKey(menuChoice.Key) || menuChoice.Key == ConsoleKey.Z) player.Update(menuChoice, logMessage, currentMessageLog);
+                    if(player.playerDirection.ContainsKey(menuChoice.Key) 
+                        || menuChoice.Key == ConsoleKey.Z) player.Update(menuChoice, logMessage, currentGameState.MessageLog);
                     foreach (var wall in walls)
                     {
                         wall.Update(player);
@@ -95,27 +98,27 @@ public abstract class GameLoop:LevelElement
                     foreach (var enemy in enemys)
                     {
                         enemy.Erase();
-                        enemy.Update(player, logMessage, currentMessageLog);
+                        enemy.Update(player, logMessage, currentGameState.MessageLog, currentGameState);
                     }
-                    var deadRats = LevelData.Elements?.OfType<Rat>().Where(e => e.HP <= 0).ToList() ?? new List<Rat>();
+                    var deadRats = currentGameState.CurrentState?.OfType<Rat>().Where(e => e.HP <= 0).ToList() ?? new List<Rat>();
                     foreach (var rat in deadRats)
                     {
                         player.XP += 23;
                     }
-                    var deadSneaks = LevelData.Elements?.OfType<Snake>().Where(e => e.HP <= 0).ToList() ?? new List<Snake>();
+                    var deadSneaks = currentGameState.CurrentState?.OfType<Snake>().Where(e => e.HP <= 0).ToList() ?? new List<Snake>();
                     foreach (var snake in deadSneaks)
                     {
                         player.XP += 57;
                     }
-                    var deadKings = LevelData.Elements?.OfType<TheRatKing>().Where(e => e.HP <= 0).ToList() ?? new List<TheRatKing>();
+                    var deadKings = currentGameState.CurrentState?.OfType<TheRatKing>().Where(e => e.HP <= 0).ToList() ?? new List<TheRatKing>();
                     foreach (var king in deadKings)
                     {
                         player.XP += 132;
                     }
 
-                    LevelData.Elements?.RemoveAll(e => e is Enemy enemy && enemy.HP <= 0);
+                    currentGameState.CurrentState?.RemoveAll(e => e is Enemy enemy && enemy.HP <= 0);
 
-                    foreach (var element in LevelData.Elements ?? Enumerable.Empty<LevelElement>())
+                    foreach (var element in currentGameState.CurrentState ?? Enumerable.Empty<LevelElement>())
                     {
                         if (element is Player)
                         {
@@ -126,8 +129,7 @@ public abstract class GameLoop:LevelElement
                             element.Draw();
                         }
                     }
-                    currentGameState.CurrentState = LevelData.Elements;
-                    currentGameState.MessageLog = currentMessageLog;
+
                 } while (player.HP > 0);
 
                 if (player.HP <= 0)

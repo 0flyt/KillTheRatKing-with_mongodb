@@ -1,6 +1,7 @@
 ﻿using Labb2_DungeonCrawler;
 using Labb2_DungeonCrawler.GameFunctions;
 using Labb2_DungeonCrawler.Log;
+using Labb2_DungeonCrawler.State;
 
 
 
@@ -22,7 +23,7 @@ public abstract class LevelElement
     {
         return "";
     }
-    public static void LevelChoice()
+    public static void LevelChoice(GameState currentGameState)
     {
         ConsoleKeyInfo userChoice;
         bool validChoiceFlag = false;
@@ -35,25 +36,25 @@ public abstract class LevelElement
                 case ConsoleKey.D1:
                     Console.SetCursorPosition(15, 16);
                     Console.Write("press [1] to play level 1");
-                    LevelData.Load("ProjectFiles\\Level1.txt");
+                    currentGameState.CurrentState = LevelData.Load("ProjectFiles\\Level1.txt");
                     validChoiceFlag = true;
                     break;
                 case ConsoleKey.D2:
                     Console.SetCursorPosition(15, 17);
                     Console.Write("press [2] to play level 2");
-                    LevelData.Load("ProjectFiles\\Level2.txt");
+                    currentGameState.CurrentState = LevelData.Load("ProjectFiles\\Level2.txt");
                     validChoiceFlag = true;
                     break;
                 case ConsoleKey.D3:
                     Console.SetCursorPosition(15, 18);
                     Console.Write("press [3] to play level 3");
-                    LevelData.Load("ProjectFiles\\Level3.txt");
+                    currentGameState.CurrentState = LevelData.Load("ProjectFiles\\Level3.txt");
                     validChoiceFlag = true;
                     break;
                 case ConsoleKey.D4:
                     Console.SetCursorPosition(15, 19);
                     Console.Write("press [4] to generate a random level");
-                    LevelData.Load(RandomMap.GenerateMap());
+                    currentGameState.CurrentState = LevelData.Load(RandomMap.GenerateMap());
                     validChoiceFlag = true;
                     break;
             }
@@ -108,13 +109,13 @@ public abstract class LevelElement
     {
         return Math.Sqrt(Math.Abs(Math.Pow(this.yCordinate - player.yCordinate, 2) + Math.Abs(Math.Pow(this.xCordinate - player.xCordinate, 2))));
     }
-    public bool IsSpaceAvailable()
+    public bool IsSpaceAvailable(GameState currentGameState)
     {
         CoOrdinate targetSpace = new CoOrdinate(this);
 
 
-        return LevelData.Elements != null &&
-               !LevelData.Elements.Any(k => k != this && k.yCordinate == targetSpace.YCord && k.xCordinate == targetSpace.XCord);
+        return currentGameState.CurrentState != null &&
+               !currentGameState.CurrentState.Any(k => k != this && k.yCordinate == targetSpace.YCord && k.xCordinate == targetSpace.XCord);
     }
     public void CollideAndConcequences(Player player, string logMessage, MessageLog messageLog)
     {
@@ -133,12 +134,12 @@ public abstract class LevelElement
             messageLog.MyLog.Add(logMessage);
         }
     }
-    public LevelElement? GetCollider()
+    public LevelElement? GetCollider(GameState currentGameState)
     {
         CoOrdinate targetSpace = new CoOrdinate(this);
-        if (LevelData.Elements == null)
+        if (currentGameState.CurrentState == null)
             return null;
-        return LevelData.Elements.FirstOrDefault(k => k != this && k.xCordinate == targetSpace.XCord && k.yCordinate == targetSpace.YCord);
+        return currentGameState.CurrentState.FirstOrDefault(k => k != this && k.xCordinate == targetSpace.XCord && k.yCordinate == targetSpace.YCord);
     }
     public int Attack(LevelElement enemy)
     {

@@ -10,7 +10,7 @@ public abstract class LevelData : LevelElement
 {
     public static List<LevelElement>? Elements { get; set; }
  
-	public static void Load(string fileName)
+	public static List<LevelElement> Load(string fileName)
 	{
         int row = 4;
         Elements = new List<LevelElement>();
@@ -41,6 +41,7 @@ public abstract class LevelData : LevelElement
             }
             row++;
         }
+        return Elements;
     }
 
 }

@@ -1,4 +1,5 @@
 ﻿using Labb2_DungeonCrawler.Log;
+using Labb2_DungeonCrawler.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,16 +22,25 @@ public class TheKingsTail : Enemy
         DefenceDice = new Dice(20, 20, 20);
         HP = 200;
     }
-    public override void Update(Player player, string logMessage, MessageLog messageLog)
+    public override void Update(Player player, string logMessage, MessageLog messageLog, GameState currentGameState)
     {
         this.lifeTime--;
         if (lifeTime <= 0)
         {
             this.Erase();
-            LevelData.Elements.Remove(this);
+            currentGameState.CurrentState.Remove(this);
         }
     }
-    public static void AddRatTails(int random0To3, int y, int x, Player player, string logMessage, MessageLog messageLog)
+    public static void AddRatTails
+        (
+            int random0To3, 
+            int y, 
+            int x, 
+            Player player, 
+            string logMessage, 
+            MessageLog messageLog, 
+            GameState currentGameState
+        )
     {
         switch (random0To3)
         {
@@ -38,7 +48,7 @@ public class TheKingsTail : Enemy
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail = new TheKingsTail() { yCordinate = y - i, xCordinate = x };
-                    if (tail.IsSpaceAvailable()) LevelData.Elements.Add(tail);
+                    if (tail.IsSpaceAvailable()) currentGameState.CurrentState.Add(tail);
                     else
                     {
                         tail.CollideAndConcequences(player, logMessage, messageLog);
@@ -48,7 +58,7 @@ public class TheKingsTail : Enemy
                 for(int i = 1; i <= tailLength; i++)
                 { 
                     TheKingsTail tail2 = new TheKingsTail() { yCordinate = y + i, xCordinate = x };
-                    if (tail2.IsSpaceAvailable()) LevelData.Elements.Add(tail2);
+                    if (tail2.IsSpaceAvailable()) currentGameState.CurrentState.Add(tail2);
                     else
                     {
                         tail2.CollideAndConcequences(player, logMessage, messageLog);
@@ -60,7 +70,7 @@ public class TheKingsTail : Enemy
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail = new TheKingsTail() { yCordinate = y + i, xCordinate = x };
-                    if (tail.IsSpaceAvailable()) LevelData.Elements.Add(tail);
+                    if (tail.IsSpaceAvailable()) currentGameState.CurrentState.Add(tail);
                     else
                     {
                         tail.CollideAndConcequences(player, logMessage, messageLog);
@@ -70,7 +80,7 @@ public class TheKingsTail : Enemy
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail2 = new TheKingsTail() { yCordinate = y, xCordinate = x - i };
-                    if (tail2.IsSpaceAvailable()) LevelData.Elements.Add(tail2);
+                    if (tail2.IsSpaceAvailable()) currentGameState.CurrentState.Add(tail2);
                     else
                     {
                         tail2.CollideAndConcequences(player, logMessage, messageLog);
@@ -82,7 +92,7 @@ public class TheKingsTail : Enemy
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail = new TheKingsTail() { yCordinate = y, xCordinate = x - i };
-                    if (tail.IsSpaceAvailable()) LevelData.Elements.Add(tail);
+                    if (tail.IsSpaceAvailable()) currentGameState.CurrentState.Add(tail);
                     else
                     {
                         tail.CollideAndConcequences(player, logMessage, messageLog);
@@ -92,7 +102,7 @@ public class TheKingsTail : Enemy
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail2 = new TheKingsTail() { yCordinate = y, xCordinate = x + i };
-                    if (tail2.IsSpaceAvailable()) LevelData.Elements.Add(tail2);
+                    if (tail2.IsSpaceAvailable()) currentGameState.CurrentState.Add(tail2);
                     else
                     {
                         tail2.CollideAndConcequences(player, logMessage, messageLog);
@@ -104,7 +114,7 @@ public class TheKingsTail : Enemy
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail = new TheKingsTail() { yCordinate = y, xCordinate = x + i };
-                    if (tail.IsSpaceAvailable()) LevelData.Elements.Add(tail);
+                    if (tail.IsSpaceAvailable()) currentGameState.CurrentState.Add(tail);
                     else
                     {
                         tail.CollideAndConcequences(player, logMessage, messageLog);
@@ -114,7 +124,7 @@ public class TheKingsTail : Enemy
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail2 = new TheKingsTail() { yCordinate = y - i, xCordinate = x };
-                    if (tail2.IsSpaceAvailable()) LevelData.Elements.Add(tail2);
+                    if (tail2.IsSpaceAvailable()) currentGameState.CurrentState.Add(tail2);
                     else
                     {
                         tail2.CollideAndConcequences(player, logMessage, messageLog);

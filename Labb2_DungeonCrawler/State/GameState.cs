@@ -8,10 +8,16 @@ using System.Threading.Tasks;
 
 namespace Labb2_DungeonCrawler.State
 {
-    internal class GameState
+    public class GameState
     {
+
         public ObjectId Id { get; set; }
         public MessageLog MessageLog { get; set; }
         public List<LevelElement> CurrentState { get; set; }  
+        public GameState()
+        {
+            MessageLog = new MessageLog();
+            CurrentState = new List<LevelElement>();
+        }
     }
 }

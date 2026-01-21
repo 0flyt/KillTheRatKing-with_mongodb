@@ -1,4 +1,5 @@
 ﻿using Labb2_DungeonCrawler.Log;
+using Labb2_DungeonCrawler.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ public class Rat : Enemy
         MyColor = ConsoleColor.Red;
     }
 
-    public override void Update(Player player, string logMessage, MessageLog messageLog)
+    public override void Update(Player player, string logMessage, MessageLog messageLog, GameState currentGameState)
     {
         int move = random.Next(4);
         switch(move)

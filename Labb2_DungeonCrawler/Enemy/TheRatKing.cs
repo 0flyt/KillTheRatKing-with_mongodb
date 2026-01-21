@@ -1,4 +1,5 @@
 ﻿using Labb2_DungeonCrawler.Log;
+using Labb2_DungeonCrawler.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ public class TheRatKing : Enemy
         
     }
     
-    public override void Update(Player player, string logMessage, MessageLog messageLog)
+    public override void Update(Player player, string logMessage, MessageLog messageLog, GameState currentGameState)
     {
         int move = random.Next(4);
         this.TurnsPlayed++;
@@ -72,7 +73,7 @@ public class TheRatKing : Enemy
             }
             if (TurnsPlayed % 3 == 0 && HP > 0)
             {
-               TheKingsTail.AddRatTails(move, yCordinate, xCordinate, player, logMessage, messageLog);
+               TheKingsTail.AddRatTails(move, yCordinate, xCordinate, player, logMessage, messageLog, currentGameState);
             }
         }
     }

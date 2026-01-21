@@ -1,5 +1,6 @@
 ﻿using Labb2_DungeonCrawler.GameFunctions;
 using Labb2_DungeonCrawler.Log;
+using Labb2_DungeonCrawler.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,14 +65,14 @@ public class Player : LevelElement
             else this.xCordinate = hold;
         }
     }
-    private void LazerShootMethod(ConsoleKey lastMove, int lazerLength, string logMessage, MessageLog messageLog)
+    private void LazerShootMethod(ConsoleKey lastMove, int lazerLength, string logMessage, MessageLog messageLog, GameState currentGameState)
     {
         if (lastMove == ConsoleKey.UpArrow || lastMove == ConsoleKey.DownArrow)
         {
             for (global::System.Int32 i = 1; i <= lazerLength; i++)
             {
                 Lazer lazer = new Lazer() { yCordinate = this.yCordinate + playerDirection[lastMove]*i, xCordinate = this.xCordinate };
-                if (lazer.IsSpaceAvailable()) LevelData.Elements?.Add(lazer);
+                if (lazer.IsSpaceAvailable()) currentGameState.CurrentState?.Add(lazer);
                 else
                 {
                     lazer.CollideAndConcequences(this, logMessage, messageLog);
@@ -84,7 +85,7 @@ public class Player : LevelElement
             for (global::System.Int32 i = 1; i <= lazerLength; i++)
             {
                 Lazer lazer = new Lazer() { yCordinate = this.yCordinate, xCordinate = this.xCordinate + playerDirection[lastMove]*i };
-                if (lazer.IsSpaceAvailable()) LevelData.Elements?.Add(lazer);
+                if (lazer.IsSpaceAvailable()) currentGameState.CurrentState?.Add(lazer);
                 else
                 {
                     lazer.CollideAndConcequences(this, logMessage, messageLog);
@@ -93,19 +94,19 @@ public class Player : LevelElement
             }
         }
     }
-    public void Update(ConsoleKeyInfo userMove, string logMessage, MessageLog messageLog)
+    public void Update(ConsoleKeyInfo userMove, string logMessage, MessageLog messageLog, GameState currentGameState)
     {
         logMessage = this.PrintUnitInfo();
         messageLog.MyLog.Add(logMessage);
         this.TurnsPlayed++;
         this.Erase();
-        var lazers = (LevelData.Elements ?? Enumerable.Empty<LevelElement>()).OfType<Lazer>().ToList();
-        if (LevelData.Elements != null) LevelData.Elements.RemoveAll(l => l is Lazer);
+        var lazers = (currentGameState.CurrentState ?? Enumerable.Empty<LevelElement>()).OfType<Lazer>().ToList();
+        if (currentGameState.CurrentState != null) currentGameState.CurrentState.RemoveAll(l => l is Lazer);
         foreach (var lazer in lazers)
         {
             lazer.Erase();
         }
-        if (userMove.Key == ConsoleKey.Z) LazerShootMethod(LastMove, 3, logMessage, messageLog);
+        if (userMove.Key == ConsoleKey.Z) LazerShootMethod(LastMove, 3, logMessage, messageLog, currentGameState);
         else PlayerMoveMethod(userMove, logMessage, messageLog);
     }
 }

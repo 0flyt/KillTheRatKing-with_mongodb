@@ -11,7 +11,7 @@ namespace Labb2_DungeonCrawler;
 
 public static class Graphics
 {
-    private static int writingSpeed = 30; 
+    private static int writingSpeed = 1; 
     public static void WriteInfo()
     {
         Console.SetCursorPosition(4, 40);

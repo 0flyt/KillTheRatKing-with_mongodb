@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Labb2_DungeonCrawler.State;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,6 @@ class Program
         {
             Console.SetBufferSize(Console.WindowWidth, 60);
             Graphics.WriteTitleScreen();
-            LevelData.Elements?.Clear();
             proceed = Console.ReadKey(true);
             GameLoop.GameStart();
             proceed = Console.ReadKey(true);
