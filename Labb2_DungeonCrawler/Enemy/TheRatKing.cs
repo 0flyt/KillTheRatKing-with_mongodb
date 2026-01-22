@@ -35,37 +35,37 @@ public class TheRatKing : Enemy
             {
                 case 0:
                     xCordinate--;
-                    if (IsSpaceAvailable()) break;
+                    if (IsSpaceAvailable(currentGameState)) break;
                     else
                     {
-                        CollideAndConcequences(player, logMessage, messageLog);
+                        CollideAndConcequences(player, logMessage, messageLog, currentGameState);
                         xCordinate++;
                         break;
                     }
                 case 1:
                     xCordinate++;
-                    if (IsSpaceAvailable()) break;
+                    if (IsSpaceAvailable(currentGameState)) break;
                     else
                     {
-                        CollideAndConcequences(player, logMessage, messageLog);
+                        CollideAndConcequences(player, logMessage, messageLog, currentGameState);
                         xCordinate--;
                         break;
                     }
                 case 2:
                     yCordinate--;
-                    if (IsSpaceAvailable()) break;
+                    if (IsSpaceAvailable(currentGameState)) break;
                     else
                     {
-                        CollideAndConcequences(player, logMessage, messageLog);
+                        CollideAndConcequences(player, logMessage, messageLog, currentGameState);
                         yCordinate++;
                         break;
                     }
                 case 3:
                     yCordinate++;
-                    if (IsSpaceAvailable()) break;
+                    if (IsSpaceAvailable(currentGameState)) break;
                     else
                     {
-                        CollideAndConcequences(player, logMessage, messageLog);
+                        CollideAndConcequences(player, logMessage, messageLog, currentGameState);
                         yCordinate--;
                         break;
                     }

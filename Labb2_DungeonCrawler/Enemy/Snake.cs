@@ -19,23 +19,23 @@ public class Snake : Enemy
         MyColor = ConsoleColor.Yellow;
     }
 
-    public void SnakeNextMove(Player player)
+    public void SnakeNextMove(Player player, GameState currentGameState)
     {
         var directions = new Dictionary<string, double>();
         yCordinate++;
-        if (IsSpaceAvailable()) directions["south"] = GetDistanceTo(player);
+        if (IsSpaceAvailable(currentGameState)) directions["south"] = GetDistanceTo(player);
         yCordinate--;
 
         yCordinate--;
-        if (IsSpaceAvailable()) directions["north"] = GetDistanceTo(player);
+        if (IsSpaceAvailable(currentGameState)) directions["north"] = GetDistanceTo(player);
         yCordinate++;
 
         xCordinate++;
-        if (IsSpaceAvailable()) directions["west"] = GetDistanceTo(player);
+        if (IsSpaceAvailable(currentGameState)) directions["west"] = GetDistanceTo(player);
         xCordinate--;
 
         xCordinate--;
-        if (IsSpaceAvailable()) directions["east"] = GetDistanceTo(player);
+        if (IsSpaceAvailable(currentGameState)) directions["east"] = GetDistanceTo(player);
         xCordinate++;
         if (directions.Any())
         {
@@ -63,7 +63,7 @@ public class Snake : Enemy
     {
         if (GetDistanceTo(player) < 2)
         {
-            SnakeNextMove(player);
+            SnakeNextMove(player, currentGameState);
         }
     }
 }

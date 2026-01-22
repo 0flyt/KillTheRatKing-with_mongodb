@@ -89,7 +89,7 @@ public abstract class GameLoop:LevelElement
                         break;
                     }
                     if(player.playerDirection.ContainsKey(menuChoice.Key) 
-                        || menuChoice.Key == ConsoleKey.Z) player.Update(menuChoice, logMessage, currentGameState.MessageLog);
+                        || menuChoice.Key == ConsoleKey.Z) player.Update(menuChoice, logMessage, currentGameState.MessageLog, currentGameState);
                     foreach (var wall in walls)
                     {
                         wall.Update(player);

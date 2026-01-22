@@ -117,9 +117,9 @@ public abstract class LevelElement
         return currentGameState.CurrentState != null &&
                !currentGameState.CurrentState.Any(k => k != this && k.yCordinate == targetSpace.YCord && k.xCordinate == targetSpace.XCord);
     }
-    public void CollideAndConcequences(Player player, string logMessage, MessageLog messageLog)
+    public void CollideAndConcequences(Player player, string logMessage, MessageLog messageLog, GameState currentGameState)
     {
-        var collider = this.GetCollider();
+        var collider = this.GetCollider(currentGameState);
         if (collider is not Wall && !(collider is Enemy && this is Enemy))
         {
             Console.SetCursorPosition(0, 1);

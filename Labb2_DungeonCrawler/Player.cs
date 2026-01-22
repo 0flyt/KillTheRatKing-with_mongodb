@@ -44,7 +44,7 @@ public class Player : LevelElement
         Console.WriteLine(returnMessage);
         return returnMessage;
     }
-    private void PlayerMoveMethod(ConsoleKeyInfo userMove, string logMessage, MessageLog messageLog)
+    private void PlayerMoveMethod(ConsoleKeyInfo userMove, string logMessage, MessageLog messageLog, GameState currentGameState)
     {
         int hold;
         LastMove = userMove.Key;
@@ -58,9 +58,9 @@ public class Player : LevelElement
             hold = this.xCordinate;
             this.xCordinate += playerDirection[userMove.Key];
         }
-        if (!this.IsSpaceAvailable())
+        if (!this.IsSpaceAvailable(currentGameState))
         {
-            CollideAndConcequences(this, logMessage, messageLog);
+            CollideAndConcequences(this, logMessage, messageLog, currentGameState);
             if (userMove.Key == ConsoleKey.UpArrow || userMove.Key == ConsoleKey.DownArrow) this.yCordinate = hold;
             else this.xCordinate = hold;
         }
@@ -72,10 +72,10 @@ public class Player : LevelElement
             for (global::System.Int32 i = 1; i <= lazerLength; i++)
             {
                 Lazer lazer = new Lazer() { yCordinate = this.yCordinate + playerDirection[lastMove]*i, xCordinate = this.xCordinate };
-                if (lazer.IsSpaceAvailable()) currentGameState.CurrentState?.Add(lazer);
+                if (lazer.IsSpaceAvailable(currentGameState)) currentGameState.CurrentState?.Add(lazer);
                 else
                 {
-                    lazer.CollideAndConcequences(this, logMessage, messageLog);
+                    lazer.CollideAndConcequences(this, logMessage, messageLog, currentGameState);
                     break;
                 }
             }
@@ -85,10 +85,10 @@ public class Player : LevelElement
             for (global::System.Int32 i = 1; i <= lazerLength; i++)
             {
                 Lazer lazer = new Lazer() { yCordinate = this.yCordinate, xCordinate = this.xCordinate + playerDirection[lastMove]*i };
-                if (lazer.IsSpaceAvailable()) currentGameState.CurrentState?.Add(lazer);
+                if (lazer.IsSpaceAvailable(currentGameState)) currentGameState.CurrentState?.Add(lazer);
                 else
                 {
-                    lazer.CollideAndConcequences(this, logMessage, messageLog);
+                    lazer.CollideAndConcequences(this, logMessage, messageLog, currentGameState);
                     break;
                 }
             }
@@ -107,6 +107,6 @@ public class Player : LevelElement
             lazer.Erase();
         }
         if (userMove.Key == ConsoleKey.Z) LazerShootMethod(LastMove, 3, logMessage, messageLog, currentGameState);
-        else PlayerMoveMethod(userMove, logMessage, messageLog);
+        else PlayerMoveMethod(userMove, logMessage, messageLog, currentGameState);
     }
 }
