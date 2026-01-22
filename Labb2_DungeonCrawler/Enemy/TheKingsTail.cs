@@ -22,46 +22,48 @@ public class TheKingsTail : Enemy
         DefenceDice = new Dice(20, 20, 20);
         HP = 200;
     }
-    public override void Update(Player player, string logMessage, MessageLog messageLog, GameState currentGameState)
+    public override void Update()
     {
         this.lifeTime--;
         if (lifeTime <= 0)
         {
             this.Erase();
-            currentGameState.CurrentState.Remove(this);
+            Game.CurrentState.Remove(this);
         }
     }
-    public static void AddRatTails
+    public void AddRatTails
         (
             int random0To3, 
             int y, 
-            int x, 
-            Player player, 
-            string logMessage, 
-            MessageLog messageLog, 
-            GameState currentGameState
+            int x
         )
     {
+        var player = Game.CurrentState.OfType<Player>().FirstOrDefault();
+        if (player == null) return;
+
+        var messageLog = Game.MessageLog;
         switch (random0To3)
         {
             case 0:
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail = new TheKingsTail() { yCordinate = y - i, xCordinate = x };
-                    if (tail.IsSpaceAvailable(currentGameState)) currentGameState.CurrentState.Add(tail);
+                    tail.SetGame(Game);
+                    if (tail.IsSpaceAvailable()) Game.CurrentState.Add(tail);
                     else
                     {
-                        tail.CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        tail.CollideAndConcequences(player);
                         break;
                     }
                 }
                 for(int i = 1; i <= tailLength; i++)
                 { 
                     TheKingsTail tail2 = new TheKingsTail() { yCordinate = y + i, xCordinate = x };
-                    if (tail2.IsSpaceAvailable(currentGameState)) currentGameState.CurrentState.Add(tail2);
+                    tail2.SetGame(Game);
+                    if (tail2.IsSpaceAvailable()) Game.CurrentState.Add(tail2);
                     else
                     {
-                        tail2.CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        tail2.CollideAndConcequences(player);
                         break;
                     }
                 }
@@ -70,20 +72,22 @@ public class TheKingsTail : Enemy
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail = new TheKingsTail() { yCordinate = y + i, xCordinate = x };
-                    if (tail.IsSpaceAvailable(currentGameState)) currentGameState.CurrentState.Add(tail);
+                    tail.SetGame(Game);
+                    if (tail.IsSpaceAvailable()) Game.CurrentState.Add(tail);
                     else
                     {
-                        tail.CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        tail.CollideAndConcequences(player);
                         break;
                     }
                 }
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail2 = new TheKingsTail() { yCordinate = y, xCordinate = x - i };
-                    if (tail2.IsSpaceAvailable(currentGameState)) currentGameState.CurrentState.Add(tail2);
+                    tail2.SetGame(Game);
+                    if (tail2.IsSpaceAvailable()) Game.CurrentState.Add(tail2);
                     else
                     {
-                        tail2.CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        tail2.CollideAndConcequences(player);
                         break;
                     }
                 }
@@ -92,20 +96,22 @@ public class TheKingsTail : Enemy
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail = new TheKingsTail() { yCordinate = y, xCordinate = x - i };
-                    if (tail.IsSpaceAvailable(currentGameState)) currentGameState.CurrentState.Add(tail);
+                    tail.SetGame(Game);
+                    if (tail.IsSpaceAvailable()) Game.CurrentState.Add(tail);
                     else
                     {
-                        tail.CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        tail.CollideAndConcequences(player);
                         break;
                     }
                 }
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail2 = new TheKingsTail() { yCordinate = y, xCordinate = x + i };
-                    if (tail2.IsSpaceAvailable(currentGameState)) currentGameState.CurrentState.Add(tail2);
+                    tail2.SetGame(Game);
+                    if (tail2.IsSpaceAvailable()) Game.CurrentState.Add(tail2);
                     else
                     {
-                        tail2.CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        tail2.CollideAndConcequences(player);
                         break;
                     }
                 }
@@ -114,20 +120,22 @@ public class TheKingsTail : Enemy
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail = new TheKingsTail() { yCordinate = y, xCordinate = x + i };
-                    if (tail.IsSpaceAvailable(currentGameState)) currentGameState.CurrentState.Add(tail);
+                    tail.SetGame(Game);
+                    if (tail.IsSpaceAvailable()) Game.CurrentState.Add(tail);
                     else
                     {
-                        tail.CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        tail.CollideAndConcequences(player);
                         break;
                     }
                 }
                 for (int i = 1; i <= tailLength; i++)
                 {
                     TheKingsTail tail2 = new TheKingsTail() { yCordinate = y - i, xCordinate = x };
-                    if (tail2.IsSpaceAvailable(currentGameState)) currentGameState.CurrentState.Add(tail2);
+                    tail2.SetGame(Game);
+                    if (tail2.IsSpaceAvailable()) Game.CurrentState.Add(tail2);
                     else
                     {
-                        tail2.CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        tail2.CollideAndConcequences(player);
                         break;
                     }
                 }

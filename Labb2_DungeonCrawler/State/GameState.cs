@@ -19,5 +19,15 @@ namespace Labb2_DungeonCrawler.State
             MessageLog = new MessageLog();
             CurrentState = new List<LevelElement>();
         }
+
+        public void SetCurrentGame(List<LevelElement> elements)
+        {
+            CurrentState = elements;
+
+            foreach (var element in CurrentState)
+            {
+                element.SetGame(this);
+            }
+        }
     }
 }

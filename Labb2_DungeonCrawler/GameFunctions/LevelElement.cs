@@ -2,11 +2,13 @@
 using Labb2_DungeonCrawler.GameFunctions;
 using Labb2_DungeonCrawler.Log;
 using Labb2_DungeonCrawler.State;
+using MongoDB.Bson.Serialization.Attributes;
 
 
 
 public abstract class LevelElement
 {
+    protected GameState? Game { get; private set; }
     public int xCordinate { get; set; }
     public int yCordinate { get; set; }
     public char Symbol { get; set; }
@@ -17,6 +19,11 @@ public abstract class LevelElement
     public Dice? AttackDice { get; set; }
     public Dice? DefenceDice { get; set; }
     public int HP { get; set; }
+
+    public void SetGame(GameState game)
+    {
+        Game = game;
+    }
 
 
     public virtual string PrintUnitInfo() 
@@ -31,30 +38,43 @@ public abstract class LevelElement
         do
         {
             userChoice = Console.ReadKey(true);
+            List<LevelElement>? elements = null;
             switch (userChoice.Key)
             {
                 case ConsoleKey.D1:
                     Console.SetCursorPosition(15, 16);
                     Console.Write("press [1] to play level 1");
-                    currentGameState.CurrentState = LevelData.Load("ProjectFiles\\Level1.txt");
+
+                    elements = LevelData.Load("ProjectFiles\\Level1.txt");
+                    currentGameState.SetCurrentGame(elements);
+
                     validChoiceFlag = true;
                     break;
                 case ConsoleKey.D2:
                     Console.SetCursorPosition(15, 17);
                     Console.Write("press [2] to play level 2");
-                    currentGameState.CurrentState = LevelData.Load("ProjectFiles\\Level2.txt");
+
+                    elements = LevelData.Load("ProjectFiles\\Level2.txt");
+                    currentGameState.SetCurrentGame(elements);
+
                     validChoiceFlag = true;
                     break;
                 case ConsoleKey.D3:
                     Console.SetCursorPosition(15, 18);
                     Console.Write("press [3] to play level 3");
-                    currentGameState.CurrentState = LevelData.Load("ProjectFiles\\Level3.txt");
+
+                    elements = LevelData.Load("ProjectFiles\\Level3.txt");
+                    currentGameState.SetCurrentGame(elements);
+
                     validChoiceFlag = true;
                     break;
                 case ConsoleKey.D4:
                     Console.SetCursorPosition(15, 19);
                     Console.Write("press [4] to generate a random level");
-                    currentGameState.CurrentState = LevelData.Load(RandomMap.GenerateMap());
+
+                    elements = LevelData.Load(RandomMap.GenerateMap());
+                    currentGameState.SetCurrentGame(elements);
+
                     validChoiceFlag = true;
                     break;
             }
@@ -109,37 +129,43 @@ public abstract class LevelElement
     {
         return Math.Sqrt(Math.Abs(Math.Pow(this.yCordinate - player.yCordinate, 2) + Math.Abs(Math.Pow(this.xCordinate - player.xCordinate, 2))));
     }
-    public bool IsSpaceAvailable(GameState currentGameState)
+    public bool IsSpaceAvailable()
     {
         CoOrdinate targetSpace = new CoOrdinate(this);
 
 
-        return currentGameState.CurrentState != null &&
-               !currentGameState.CurrentState.Any(k => k != this && k.yCordinate == targetSpace.YCord && k.xCordinate == targetSpace.XCord);
+        return Game != null && Game.CurrentState != null &&
+               !Game.CurrentState.Any(k => k != this && k.yCordinate == targetSpace.YCord && k.xCordinate == targetSpace.XCord);
     }
-    public void CollideAndConcequences(Player player, string logMessage, MessageLog messageLog, GameState currentGameState)
+
+    public void CollideAndConcequences(Player player)
     {
-        var collider = this.GetCollider(currentGameState);
+        var collider = GetCollider();
+
         if (collider is not Wall && !(collider is Enemy && this is Enemy))
         {
             Console.SetCursorPosition(0, 1);
             Console.Write(new string(' ', Console.WindowWidth));
-            Console.Write(new string(' ', Console.WindowWidth));
+
             Console.SetCursorPosition(0, 1);
-            PrintFightresult(Fight(collider), collider, player, logMessage, messageLog);
-            if (collider.HP > 0) collider.PrintFightresult(collider.Fight(this), this, player, logMessage, messageLog);
-            logMessage = this.PrintUnitInfo();
-            messageLog.MyLog.Add(logMessage);
-            logMessage = collider.PrintUnitInfo();
-            messageLog.MyLog.Add(logMessage);
+
+            PrintFightresult(Fight(collider), collider, player);
+            if (collider.HP > 0) 
+                collider.PrintFightresult(collider.Fight(this), this, player);
+
+            Game.MessageLog.MyLog.Add(PrintUnitInfo());
+            Game.MessageLog.MyLog.Add(collider.PrintUnitInfo());
         }
     }
-    public LevelElement? GetCollider(GameState currentGameState)
+
+    public LevelElement? GetCollider()
     {
         CoOrdinate targetSpace = new CoOrdinate(this);
-        if (currentGameState.CurrentState == null)
-            return null;
-        return currentGameState.CurrentState.FirstOrDefault(k => k != this && k.xCordinate == targetSpace.XCord && k.yCordinate == targetSpace.YCord);
+
+        if (Game.CurrentState == null) return null;
+
+        return Game.CurrentState
+            .FirstOrDefault(k => k != this && k.xCordinate == targetSpace.XCord && k.yCordinate == targetSpace.YCord);
     }
     public int Attack(LevelElement enemy)
     {
@@ -163,8 +189,10 @@ public abstract class LevelElement
         }
         else return -1;
     }
-    public void PrintFightresult(int fightreturn, LevelElement enemy, Player player, string logMessage, MessageLog messageLog)
+    public void PrintFightresult(int fightreturn, LevelElement enemy, Player player)
     {
+        string logMessage;
+
         if (enemy is TheKingsTail)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -201,7 +229,7 @@ public abstract class LevelElement
             logMessage = $"{this.Name} attacked {enemy.Name} with {this.AttackDice} and {enemy.Name} defended with {enemy.DefenceDice}. Attack failed and did no damage";
             Console.WriteLine(logMessage);
         }
-        messageLog.MyLog.Add(logMessage);
+        Game.MessageLog.MyLog.Add(logMessage);
     }
 
 

@@ -28,17 +28,17 @@ public abstract class GameLoop:LevelElement
             string userName = Graphics.WriteStartScreen();
             while(true)
             {
-                //LevelData.Elements?.Clear();
+
                 currentGameState.CurrentState?.Clear();
                 Graphics.WriteLevelSelect(userName);
                 LevelChoice(currentGameState);
-                //var player = LevelData.Elements?.OfType<Player>().FirstOrDefault();
+
                 var player = currentGameState.CurrentState?.OfType<Player>().FirstOrDefault();
                 if (player == null)
                 {
                     throw new ArgumentNullException("no player found, add a player to the map");
                 }
-                //var enemys = LevelData.Elements?.OfType<Enemy>().ToList();
+
                 var enemys = currentGameState.CurrentState?.OfType<Enemy>().ToList();
                 if (enemys == null)
                 {
@@ -61,7 +61,7 @@ public abstract class GameLoop:LevelElement
                 Graphics.WriteInfo();
                 foreach (var wall in walls ?? Enumerable.Empty<Wall>())
                 {
-                    wall.Update(player);
+                    wall.Update();
                     if (wall.IsToBeDrawn()) wall.Draw();
                 }
                 foreach (var element in currentGameState.CurrentState ?? Enumerable.Empty<LevelElement>())
@@ -89,16 +89,16 @@ public abstract class GameLoop:LevelElement
                         break;
                     }
                     if(player.playerDirection.ContainsKey(menuChoice.Key) 
-                        || menuChoice.Key == ConsoleKey.Z) player.Update(menuChoice, logMessage, currentGameState.MessageLog, currentGameState);
+                        || menuChoice.Key == ConsoleKey.Z) player.Update(menuChoice);
                     foreach (var wall in walls)
                     {
-                        wall.Update(player);
+                        wall.Update();
                         if (wall.IsToBeDrawn()) wall.Draw();
                     }
                     foreach (var enemy in enemys)
                     {
                         enemy.Erase();
-                        enemy.Update(player, logMessage, currentGameState.MessageLog, currentGameState);
+                        enemy.Update();
                     }
                     var deadRats = currentGameState.CurrentState?.OfType<Rat>().Where(e => e.HP <= 0).ToList() ?? new List<Rat>();
                     foreach (var rat in deadRats)

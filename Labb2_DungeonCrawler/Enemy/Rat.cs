@@ -22,44 +22,47 @@ public class Rat : Enemy
         MyColor = ConsoleColor.Red;
     }
 
-    public override void Update(Player player, string logMessage, MessageLog messageLog, GameState currentGameState)
+    public override void Update()
     {
+        var player = Game.CurrentState.OfType<Player>().First();
+
         int move = random.Next(4);
+
         switch(move)
         {
             case 0:
                 xCordinate--;
-                if (IsSpaceAvailable(currentGameState)) break;
+                if (IsSpaceAvailable()) break;
                 else
                 {
-                    CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                    CollideAndConcequences(player);
                     xCordinate++;
                     break;
                 }
             case 1:
                 xCordinate++;
-                if (IsSpaceAvailable(currentGameState)) break;
+                if (IsSpaceAvailable()) break;
                 else
                 {
-                    CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                    CollideAndConcequences(player);
                     xCordinate--;
                     break;
                 }
             case 2:
                 yCordinate--;
-                if (IsSpaceAvailable(currentGameState)) break;
+                if (IsSpaceAvailable()) break;
                 else
                 {
-                    CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                    CollideAndConcequences(player);
                     yCordinate++;
                     break;
                 }
             case 3:
                 yCordinate++;
-                if (IsSpaceAvailable(currentGameState)) break;
+                if (IsSpaceAvailable()) break;
                 else
                 {
-                    CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                    CollideAndConcequences(player);
                     yCordinate--;
                     break;
                 }

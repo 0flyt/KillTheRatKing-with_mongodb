@@ -11,7 +11,10 @@ namespace Labb2_DungeonCrawler;
 
 public abstract class Enemy : LevelElement
 {
-    public abstract void Update(Player player, string logMessage, MessageLog messageLog, GameState currentGameState);
+    public virtual void Update()
+    {
+
+    }
     public override string PrintUnitInfo()
     {
         Console.SetCursorPosition(0, 3);

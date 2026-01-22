@@ -15,8 +15,10 @@ public class Wall : LevelElement
         MyColor = ConsoleColor.DarkGray;
     }
     
-    public void Update(Player player)
+    public void Update()
     {
+        var player = Game.CurrentState.OfType<Player>().First();
+
         if (GetDistanceTo(player) < 5)
         {
             MyColor = ConsoleColor.Gray;

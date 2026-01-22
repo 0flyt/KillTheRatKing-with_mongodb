@@ -19,23 +19,25 @@ public class Snake : Enemy
         MyColor = ConsoleColor.Yellow;
     }
 
-    public void SnakeNextMove(Player player, GameState currentGameState)
+    public void SnakeNextMove()
     {
+        var player = Game.CurrentState.OfType<Player>().First();
+
         var directions = new Dictionary<string, double>();
         yCordinate++;
-        if (IsSpaceAvailable(currentGameState)) directions["south"] = GetDistanceTo(player);
+        if (IsSpaceAvailable()) directions["south"] = GetDistanceTo(player);
         yCordinate--;
 
         yCordinate--;
-        if (IsSpaceAvailable(currentGameState)) directions["north"] = GetDistanceTo(player);
+        if (IsSpaceAvailable()) directions["north"] = GetDistanceTo(player);
         yCordinate++;
 
         xCordinate++;
-        if (IsSpaceAvailable(currentGameState)) directions["west"] = GetDistanceTo(player);
+        if (IsSpaceAvailable()) directions["west"] = GetDistanceTo(player);
         xCordinate--;
 
         xCordinate--;
-        if (IsSpaceAvailable(currentGameState)) directions["east"] = GetDistanceTo(player);
+        if (IsSpaceAvailable()) directions["east"] = GetDistanceTo(player);
         xCordinate++;
         if (directions.Any())
         {
@@ -59,11 +61,13 @@ public class Snake : Enemy
 
     }
 
-    public override void Update(Player player, string logMessage, MessageLog messageLog, GameState currentGameState)
+    public override void Update()
     {
+        var player = Game.CurrentState.OfType<Player>().First();
+
         if (GetDistanceTo(player) < 2)
         {
-            SnakeNextMove(player, currentGameState);
+            SnakeNextMove();
         }
     }
 }

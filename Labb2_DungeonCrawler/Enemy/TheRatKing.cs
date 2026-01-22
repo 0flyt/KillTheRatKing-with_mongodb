@@ -25,8 +25,9 @@ public class TheRatKing : Enemy
         
     }
     
-    public override void Update(Player player, string logMessage, MessageLog messageLog, GameState currentGameState)
+    public override void Update()
     {
+        var player = Game.CurrentState.OfType<Player>().First();
         int move = random.Next(4);
         this.TurnsPlayed++;
         if (TurnsPlayed % 2 == 0)
@@ -35,37 +36,37 @@ public class TheRatKing : Enemy
             {
                 case 0:
                     xCordinate--;
-                    if (IsSpaceAvailable(currentGameState)) break;
+                    if (IsSpaceAvailable()) break;
                     else
                     {
-                        CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        CollideAndConcequences(player);
                         xCordinate++;
                         break;
                     }
                 case 1:
                     xCordinate++;
-                    if (IsSpaceAvailable(currentGameState)) break;
+                    if (IsSpaceAvailable()) break;
                     else
                     {
-                        CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        CollideAndConcequences(player);
                         xCordinate--;
                         break;
                     }
                 case 2:
                     yCordinate--;
-                    if (IsSpaceAvailable(currentGameState)) break;
+                    if (IsSpaceAvailable()) break;
                     else
                     {
-                        CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        CollideAndConcequences(player);
                         yCordinate++;
                         break;
                     }
                 case 3:
                     yCordinate++;
-                    if (IsSpaceAvailable(currentGameState)) break;
+                    if (IsSpaceAvailable()) break;
                     else
                     {
-                        CollideAndConcequences(player, logMessage, messageLog, currentGameState);
+                        CollideAndConcequences(player);
                         yCordinate--;
                         break;
                     }
@@ -73,7 +74,9 @@ public class TheRatKing : Enemy
             }
             if (TurnsPlayed % 3 == 0 && HP > 0)
             {
-               TheKingsTail.AddRatTails(move, yCordinate, xCordinate, player, logMessage, messageLog, currentGameState);
+                var tailSpawner = new TheKingsTail() { xCordinate = xCordinate, yCordinate = yCordinate };
+                tailSpawner.SetGame(Game);
+                tailSpawner.AddRatTails(move, yCordinate, xCordinate);
             }
         }
     }
