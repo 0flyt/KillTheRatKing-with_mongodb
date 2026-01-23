@@ -2,3 +2,5 @@
 
 Möjlighet att spela utan musik
 (Volym på musiken)
+
+MOngo borde spara Player som en egen field för om man går ur en bana så töms hela currentState-listan

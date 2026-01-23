@@ -102,12 +102,16 @@ public class Player : LevelElement
     public void Update(ConsoleKeyInfo userMove)
     {
         string logMessage = this.PrintUnitInfo();
-        Game.MessageLog.MyLog.Add(logMessage);
+        Game?.MessageLog.MyLog.Add(logMessage);
         this.TurnsPlayed++;
         this.Erase();
 
-        var lazers = (Game.CurrentState ?? Enumerable.Empty<LevelElement>()).OfType<Lazer>().ToList();
-        if (Game.CurrentState != null) Game.CurrentState.RemoveAll(l => l is Lazer);
+        var lazers = Game?.CurrentState?
+        .OfType<Lazer>()
+        .ToList() ?? new List<Lazer>();
+
+        Game?.CurrentState?.RemoveAll(l => l is Lazer);
+
         foreach (var lazer in lazers)
         {
             lazer.Erase();
@@ -115,4 +119,17 @@ public class Player : LevelElement
         if (userMove.Key == ConsoleKey.Z) LazerShootMethod(LastMove, 3);
         else PlayerMoveMethod(userMove);
     }
+
+    public void Init()
+    {
+        AttackDice = new Dice(6, 2, 2);
+        DefenceDice = new Dice(6, 2, 0);
+        MyColor = ConsoleColor.White;
+        playerDirection = new Dictionary<ConsoleKey, int>();
+        playerDirection.Add(ConsoleKey.UpArrow, -1);
+        playerDirection.Add(ConsoleKey.LeftArrow, -1);
+        playerDirection.Add(ConsoleKey.DownArrow, +1);
+        playerDirection.Add(ConsoleKey.RightArrow, +1);
+    }
+
 }

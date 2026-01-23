@@ -21,7 +21,7 @@ namespace Labb2_DungeonCrawler.MongoConnection
             var db = client.GetDatabase(dataBaseName);
             collection = db.GetCollection<GameState>(saveCollectionName);
         }
-        public static async void SaveGameToDB(GameState gameState)
+        public static async Task SaveGameToDB(GameState gameState)
         {
             ConnectToDB();
             var gameStateFilter = Builders<GameState>.Filter.Eq(g => g.Id, gameState.Id);

@@ -14,29 +14,34 @@ namespace Labb2_DungeonCrawler;
 
 public static class GameLoop
 {
-    public static async void GameStart()
+    public static async Task GameStart()
     {
         PlayMusicLoop();
         string userName = Graphics.WriteStartScreen();
+        Console.Clear();
         var currentGameState = new GameState();
         var player = new Player();
         bool isAlive = true;
-        int savedXP = 100;
-        int savedHP = 100;
+        int savedXP = -1;
+        int savedHP = -1;
         Console.CursorVisible = false;
         
         while (true)
         {
             if (userName == "bjorn")
             {
-                currentGameState = await MongoConnection.MongoConnection.LoadGameFromDB("697368ab3e16db1fb06100ca");
+                currentGameState = await MongoConnection.MongoConnection.LoadGameFromDB("697388421d38729a2c371a64");
+                foreach (var element in currentGameState.CurrentState)
+                {
+                    element.SetGame(currentGameState);
+                }
             }
             else
             {
-                StartNewGame(currentGameState, player, userName);
+                currentGameState = StartNewGame(currentGameState, player, userName);
                 
             }
-            InitializeGame(currentGameState, player, savedHP, savedXP, userName);
+            player = InitializeGame(currentGameState, player, savedHP, savedXP, userName);
 
             //var enemys = currentGameState.CurrentState?.OfType<Enemy>().ToList();
             //if (enemys == null)
@@ -60,7 +65,7 @@ public static class GameLoop
                     savedXP = player.XP;
                     savedHP = player.HP;
                     currentGameState.CurrentState.Clear();
-                    MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
+                    await MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
                     break;
                 }
                 if(player.playerDirection.ContainsKey(menuChoice.Key) 
@@ -70,13 +75,13 @@ public static class GameLoop
                 UpdateEnemies(currentGameState);
                 HandleDeadEnemies(currentGameState, player);
                 DrawAll(currentGameState, player);
-                MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
+                await MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
             };
 
             if (player.HP <= 0)
             {
                 HandlePlayerDeath(ref isAlive, ref savedXP, ref savedHP, player, currentGameState);
-                MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
+                await MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
             }
         }
     }
@@ -92,7 +97,7 @@ public static class GameLoop
         gameState = await MongoConnection.MongoConnection.LoadGameFromDB("69736a4e2405af0356161604");
     }
 
-    private static void StartNewGame(GameState currentGameState, Player player, string userName)
+    private static GameState StartNewGame(GameState currentGameState, Player player, string userName)
     {
         currentGameState = new GameState();
         //currentGameState = MongoConnection.MongoConnection
@@ -101,8 +106,9 @@ public static class GameLoop
         //                .GetResult();
         Graphics.WriteLevelSelect(userName);
         LevelElement.LevelChoice(currentGameState);
+        return currentGameState;
     }
-    private static void InitializeGame(GameState currentGameState, Player player, int savedHP, int savedXP, string userName)
+    private static Player InitializeGame(GameState currentGameState, Player player, int savedHP, int savedXP, string userName)
     {
         player = currentGameState.CurrentState?.OfType<Player>().FirstOrDefault();
         if (player == null)
@@ -113,6 +119,7 @@ public static class GameLoop
         currentGameState.PlayerName = userName;
 
         if (savedHP != -1)
+        player.Init();
         {
             player.HP = savedHP;
             player.XP = savedXP;
@@ -129,6 +136,7 @@ public static class GameLoop
         currentGameState.MessageLog.MyLog.Add(logMessage);
 
         DrawAll(currentGameState, player);
+        return player;
     }
 
     private static void DrawAll(GameState gameState, Player player)
