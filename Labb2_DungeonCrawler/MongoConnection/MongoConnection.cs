@@ -30,7 +30,7 @@ namespace Labb2_DungeonCrawler.MongoConnection
                 await collection.InsertOneAsync(gameState);
             }
             else await collection.ReplaceOneAsync(gameStateFilter ,gameState);
-
+            //om filtert "returnerar" en save så replace annars insert, den här ska bara triggas när man gjort en Load
         }
 
         public static async Task<GameState?> LoadGameFromDB(ObjectId id)
