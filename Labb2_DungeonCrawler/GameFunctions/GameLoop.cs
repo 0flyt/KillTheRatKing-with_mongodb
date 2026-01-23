@@ -22,8 +22,8 @@ public static class GameLoop
         var currentGameState = new GameState();
         var player = new Player();
         bool isAlive = true;
-        int savedXP = -1;
-        int savedHP = -1;
+        int savedXP = 0;
+        int savedHP = 100;
         Console.CursorVisible = false;
         
         while (true)
