@@ -7,7 +7,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 
     [BsonDiscriminator]
-    [BsonKnownTypes(typeof(Player), typeof(Enemy), typeof(Rat), typeof(Snake), typeof(TheRatKing), typeof(TheKingsTail), typeof(Wall))]
+    [BsonKnownTypes(typeof(Player), typeof(Rat), typeof(Snake), typeof(TheRatKing), typeof(TheKingsTail), typeof(Wall))]
 public abstract class LevelElement
 {
     [BsonIgnore]

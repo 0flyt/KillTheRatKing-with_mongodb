@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Labb2_DungeonCrawler.State;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Labb2_DungeonCrawler;
 public static class Graphics
 {
     private static int writingSpeed = 1; 
+
     public static void WriteInfo()
     {
         Console.SetCursorPosition(4, 40);
@@ -111,7 +113,7 @@ public static class Graphics
         }
 
     }
-    public static void WriteEndScreen(Player player)
+    public static void WriteEndScreen(Player player, GameState gameState)
     {
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -130,6 +132,7 @@ public static class Graphics
             Console.Write(item);
             Thread.Sleep(writingSpeed);
         }
+        gameState.MessageLog.MyLog.Add(roundInfo);
         //return Console.ReadKey(true);
     }
     public static string WriteStartScreen()

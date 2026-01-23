@@ -14,18 +14,29 @@ namespace Labb2_DungeonCrawler;
 
 public static class GameLoop
 {
-    public static void GameStart()
+    public static async void GameStart()
     {
         PlayMusicLoop();
         string userName = Graphics.WriteStartScreen();
+        var currentGameState = new GameState();
+        var player = new Player();
         bool isAlive = true;
-        int savedXP = -1;
-        int savedHP = -1;
+        int savedXP = 100;
+        int savedHP = 100;
         Console.CursorVisible = false;
         
         while (true)
         {
-            StartGame(out var currentGameState, out var player, userName, savedHP, savedXP);
+            if (userName == "bjorn")
+            {
+                currentGameState = await MongoConnection.MongoConnection.LoadGameFromDB("697368ab3e16db1fb06100ca");
+            }
+            else
+            {
+                StartNewGame(currentGameState, player, userName);
+                
+            }
+            InitializeGame(currentGameState, player, savedHP, savedXP, userName);
 
             //var enemys = currentGameState.CurrentState?.OfType<Enemy>().ToList();
             //if (enemys == null)
@@ -48,6 +59,8 @@ public static class GameLoop
                     Console.Clear();
                     savedXP = player.XP;
                     savedHP = player.HP;
+                    currentGameState.CurrentState.Clear();
+                    MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
                     break;
                 }
                 if(player.playerDirection.ContainsKey(menuChoice.Key) 
@@ -62,7 +75,8 @@ public static class GameLoop
 
             if (player.HP <= 0)
             {
-                HandlePlayerDeath(ref isAlive, ref savedXP, ref savedHP, player);
+                HandlePlayerDeath(ref isAlive, ref savedXP, ref savedHP, player, currentGameState);
+                MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
             }
         }
     }
@@ -73,7 +87,12 @@ public static class GameLoop
         musicPlayer.PlayLooping();
     }
 
-    private static void StartGame(out GameState currentGameState, out Player player, string userName, int savedHP, int savedXP)
+    private static async Task LoadGame(GameState gameState)
+    {
+        gameState = await MongoConnection.MongoConnection.LoadGameFromDB("69736a4e2405af0356161604");
+    }
+
+    private static void StartNewGame(GameState currentGameState, Player player, string userName)
     {
         currentGameState = new GameState();
         //currentGameState = MongoConnection.MongoConnection
@@ -82,14 +101,16 @@ public static class GameLoop
         //                .GetResult();
         Graphics.WriteLevelSelect(userName);
         LevelElement.LevelChoice(currentGameState);
-
+    }
+    private static void InitializeGame(GameState currentGameState, Player player, int savedHP, int savedXP, string userName)
+    {
         player = currentGameState.CurrentState?.OfType<Player>().FirstOrDefault();
         if (player == null)
         {
             throw new ArgumentNullException("no player found, add a player to the map");
         }
-
         player.Name = userName;
+        currentGameState.PlayerName = userName;
 
         if (savedHP != -1)
         {
@@ -168,12 +189,12 @@ public static class GameLoop
         gameState.CurrentState?.RemoveAll(e => e is Enemy enemy && enemy.HP <= 0);
     }
 
-    private static void HandlePlayerDeath(ref bool isAlive, ref int savedXP, ref int savedHP, Player player)
+    private static void HandlePlayerDeath(ref bool isAlive, ref int savedXP, ref int savedHP, Player player, GameState gameState)
     {
         isAlive = false;
         savedXP = 0;
         savedHP = 100;
-        Graphics.WriteEndScreen(player);
+        Graphics.WriteEndScreen(player, gameState);
 
         ConsoleKeyInfo menuChoice;
         do

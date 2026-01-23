@@ -25,17 +25,19 @@ namespace Labb2_DungeonCrawler.MongoConnection
         {
             ConnectToDB();
             var gameStateFilter = Builders<GameState>.Filter.Eq(g => g.Id, gameState.Id);
-            if(gameState.Id == null || gameState.Id == default)
+            if(gameState.Id == ObjectId.Empty || gameState.Id == default)
             {
                 await collection.InsertOneAsync(gameState);
             }
             else await collection.ReplaceOneAsync(gameStateFilter ,gameState);
-            //om filtert "returnerar" en save så replace annars insert, den här ska bara triggas när man gjort en Load
+            //om filtert "returnerar" en save så replace annars insert
         }
 
-        public static async Task<GameState?> LoadGameFromDB(ObjectId id)
+        public static async Task<GameState?> LoadGameFromDB(string stringId)
         {
             ConnectToDB();
+
+            ObjectId id = MongoDB.Bson.ObjectId.Parse(stringId);
             var filter = Builders<GameState>.Filter.Eq(g => g.Id, id);
             return await collection.Find(filter).FirstOrDefaultAsync();         
         }
