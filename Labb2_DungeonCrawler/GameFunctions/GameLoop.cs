@@ -30,7 +30,7 @@ public static class GameLoop
         {
             if (userName == "bjorn")
             {
-                currentGameState = await MongoConnection.MongoConnection.LoadGameFromDB("697388421d38729a2c371a64");
+                currentGameState = await MongoConnection.MongoConnection.LoadGameFromDB("697509ff5a71c9dc756c0185");
                 foreach (var element in currentGameState.CurrentState)
                 {
                     element.SetGame(currentGameState);
@@ -65,7 +65,7 @@ public static class GameLoop
                     savedXP = player.XP;
                     savedHP = player.HP;
                     currentGameState.CurrentState.Clear();
-                    await MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
+                    MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
                     break;
                 }
                 if(player.playerDirection.ContainsKey(menuChoice.Key) 
@@ -75,7 +75,7 @@ public static class GameLoop
                 UpdateEnemies(currentGameState);
                 HandleDeadEnemies(currentGameState, player);
                 DrawAll(currentGameState, player);
-                await MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
+                MongoConnection.MongoConnection.SaveGameToDB(currentGameState);
             };
 
             if (player.HP <= 0)
