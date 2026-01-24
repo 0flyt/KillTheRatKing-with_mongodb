@@ -13,11 +13,13 @@ namespace Labb2_DungeonCrawler.State
     {
         [BsonId]
         public ObjectId Id { get; set; }
+        public string PlayerName { get; set; }
         public MessageLog MessageLog { get; set; }
         public List<LevelElement> CurrentState { get; set; }  
-        public GameState()
+        public GameState(string userName)
         {
             Id = new ObjectId();
+            PlayerName = userName;
             MessageLog = new MessageLog();
             CurrentState = new List<LevelElement>();
         }

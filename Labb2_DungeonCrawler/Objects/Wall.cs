@@ -8,7 +8,7 @@ namespace Labb2_DungeonCrawler;
 
 public class Wall : LevelElement
 {
-    private bool IsFound = false;
+    public bool IsFound { get; set; } = false;
     public Wall()
     {
         Symbol = '#';
@@ -18,11 +18,12 @@ public class Wall : LevelElement
     public void Update()
     {
         var player = Game.CurrentState.OfType<Player>().First();
+        bool isNearPlayer = GetDistanceTo(player) < 5;
 
-        if (GetDistanceTo(player) < 5)
+        if (isNearPlayer)
         {
-            MyColor = ConsoleColor.Gray;
             IsFound = true;
+            MyColor = ConsoleColor.Gray;
         }
         else if (IsFound)
         {

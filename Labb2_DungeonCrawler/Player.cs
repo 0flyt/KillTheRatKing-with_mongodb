@@ -2,6 +2,7 @@
 using Labb2_DungeonCrawler.Log;
 using Labb2_DungeonCrawler.State;
 using MongoDB.Bson.Serialization.Attributes;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,10 @@ public class Player : LevelElement
 {
     [BsonIgnore]
     public ConsoleKey LastMove { get; set; }
+
+    public int lastX { get; set; }
+    public int lastY { get; set; }
+
     [BsonIgnore]
     public Dictionary<ConsoleKey, int> playerDirection;
     public Player(string name = "player")
@@ -99,8 +104,29 @@ public class Player : LevelElement
             }
         }
     }
+
+    public void LoadPlayerData()
+    {
+        MyColor = ConsoleColor.White;
+
+        AttackDice = new Dice(6, 2, 2);
+        DefenceDice = new Dice(6, 2, 0);
+
+        playerDirection = new Dictionary<ConsoleKey, int>()
+        {
+            { ConsoleKey.UpArrow, -1 },
+            { ConsoleKey.LeftArrow, -1 },
+            { ConsoleKey.DownArrow, 1 },
+            { ConsoleKey.RightArrow, 1 }
+        };
+
+        LastMove = ConsoleKey.RightArrow;
+    }
+
     public void Update(ConsoleKeyInfo userMove)
     {
+        lastX = xCordinate;
+        lastY = yCordinate;
         string logMessage = this.PrintUnitInfo();
         Game.MessageLog.MyLog.Add(logMessage);
         this.TurnsPlayed++;
@@ -112,7 +138,20 @@ public class Player : LevelElement
         {
             lazer.Erase();
         }
-        if (userMove.Key == ConsoleKey.Z) LazerShootMethod(LastMove, 3);
+        if (userMove.Key == ConsoleKey.Z)
+        {
+            var facing = GetFacingFromPosition();
+            LazerShootMethod(facing, 3);
+        }
         else PlayerMoveMethod(userMove);
+    }
+    private ConsoleKey GetFacingFromPosition()
+    {
+        if (xCordinate > lastX) return ConsoleKey.RightArrow;
+        if (xCordinate < lastX) return ConsoleKey.LeftArrow;
+        if (yCordinate > lastY) return ConsoleKey.DownArrow;
+        if (yCordinate < lastY) return ConsoleKey.UpArrow;
+
+        return LastMove;
     }
 }
