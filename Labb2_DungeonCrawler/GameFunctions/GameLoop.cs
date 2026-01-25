@@ -229,13 +229,8 @@ public static class GameLoop
             HandleDeadEnemies(gameState, player);
             DrawAll(gameState, player);
             MongoConnection.MongoConnection.SaveGameToDB(gameState);
-        }
-        ;
-
-
-
-        HandlePlayerDeath(player);
-
+        };
+        HandlePlayerDeath(player, gameState.Id);
     }
 
     private static void DrawAll(GameState gameState, Player player)
@@ -296,11 +291,8 @@ public static class GameLoop
         gameState.CurrentState?.RemoveAll(e => e is Enemy enemy && enemy.HP <= 0);
     }
 
-    private static void HandlePlayerDeath(Player player)
+    private static void HandlePlayerDeath(Player player, ObjectId id)
     {
-        //isAlive = false;
-        //savedXP = 0;
-        //savedHP = 100;
         Graphics.WriteEndScreen(player);
 
         ConsoleKeyInfo menuChoice;
@@ -308,9 +300,11 @@ public static class GameLoop
         {
             menuChoice = Console.ReadKey(true);
         }
-        while (menuChoice.Key != ConsoleKey.Escape && menuChoice.Key != ConsoleKey.Enter);
-        if (menuChoice.Key == ConsoleKey.Enter) Console.Clear();
-        //else if (menuChoice.Key == ConsoleKey.Escape) 
+        while (menuChoice.Key != ConsoleKey.Enter);
+        if (menuChoice.Key == ConsoleKey.Enter)
+        {
+            DeleteSave(id);
+        }
     }
     static SaveInfoDTO SelectSaveFromList(char purpose)
     {
