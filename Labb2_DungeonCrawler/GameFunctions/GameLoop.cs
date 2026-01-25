@@ -16,9 +16,9 @@ namespace Labb2_DungeonCrawler;
 public static class GameLoop
 {
 
-    public static void GameStart()
+    public static async Task GameStart()
     {
-        string pasteObjectIdHere = "697511ede35f016ff860393e";
+        string pasteObjectIdHere = "69750f0948246dd5a0efd7cf";
 
 
         PlayMusicLoop();
@@ -29,14 +29,14 @@ public static class GameLoop
         ObjectId id;
         Console.CursorVisible = false;
         Console.WriteLine("Press [L] to load, [D] to delete save and start a new game, anything else to just start a new game");
-        var loadOrNew = Console.ReadKey(true);
-        if (loadOrNew.Key == ConsoleKey.D)
+        var loadNewOrDelete = Console.ReadKey(true);
+        if (loadNewOrDelete.Key == ConsoleKey.D)
         {
             DeleteSave(ObjectId.Parse(pasteObjectIdHere));
         }
-        if (loadOrNew.Key == ConsoleKey.L)
+        if (loadNewOrDelete.Key == ConsoleKey.L)
         {
-            id = ObjectId.Parse(pasteObjectIdHere);
+            id = SelectSaveFromList();
         }
         else
         {
@@ -101,6 +101,12 @@ public static class GameLoop
         InitGame(gameState, userName, savedHP: null, savedXP: null);
 
         return gameState;
+    }
+    private static List<SaveInfoDTO> GetSavesPlayerName()
+    {
+        return MongoConnection.MongoConnection.GetActiveSavesFromDB()
+        .GetAwaiter()
+        .GetResult();
     }
     private async static void DeleteSave(ObjectId id)
     {
@@ -249,4 +255,45 @@ public static class GameLoop
         if (menuChoice.Key == ConsoleKey.Enter) Console.Clear();
         //else if (menuChoice.Key == ConsoleKey.Escape) 
     }
+    static ObjectId SelectSaveFromList()
+    {
+        var saves = GetSavesPlayerName();
+        int index = 0;
+        ConsoleKey key;
+
+        do
+        {
+            Console.Clear();
+
+            for (int i = 0; i < saves.Count; i++)
+            {
+                if (i == index)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($">    {saves[i].PlayerName}, {saves[i].Id.ToString().Substring(saves[i].Id.ToString().Length - 5)}");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"    {saves[i].PlayerName}, {saves[i].Id.ToString().Substring(saves[i].Id.ToString().Length - 5)}");
+                }
+            }
+
+            Console.ResetColor();
+
+            key = Console.ReadKey(true).Key;
+
+            if (key == ConsoleKey.UpArrow && index > 0)
+                index--;
+            else if (key == ConsoleKey.DownArrow && index < saves.Count - 1)
+                index++;
+
+        } while (key != ConsoleKey.Enter);
+
+        Console.ResetColor();
+        Console.Clear();
+
+        return saves[index].Id;
+    }
+
 }

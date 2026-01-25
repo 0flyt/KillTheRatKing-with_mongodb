@@ -47,5 +47,17 @@ namespace Labb2_DungeonCrawler.MongoConnection
             await collection.DeleteOneAsync(filter);
 
         }
+        public static async Task<List<SaveInfoDTO>> GetActiveSavesFromDB()
+        {
+            ConnectToDB();
+            return await collection
+                            .Find(Builders<GameState>.Filter.Empty)
+                            .Project(g => new SaveInfoDTO
+                            {
+                                Id = g.Id,
+                                PlayerName = g.PlayerName
+                            })
+                            .ToListAsync();
+        }
     }
 }
