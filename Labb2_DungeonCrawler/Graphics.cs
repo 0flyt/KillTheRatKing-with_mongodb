@@ -16,7 +16,7 @@ public static class Graphics
     {
         Console.SetCursorPosition(4, 40);
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.Write("Press [esc] to leave and play another level (HP and XP is saved)");
+        Console.Write("| press [L] to open message log | press [esc] to leave and play another level (HP and XP is saved)");
     }
     public static void WriteTitleScreen()
     {
