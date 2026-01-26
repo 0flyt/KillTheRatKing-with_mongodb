@@ -75,5 +75,14 @@ namespace Labb2_DungeonCrawler.MongoConnection
                             .Project(c => c.ClassName)
                             .ToListAsync();
         }
+        public static async Task<ObjectId> GetClassId(string className)
+        {
+            ConnectToDB();
+            return await classCollection
+                            .Find(Builders<ClassModel>
+                            .Filter.Eq(c => c.ClassName, className))
+                            .Project(c => c.Id)
+                            .FirstOrDefaultAsync();
+        }
     }
 }

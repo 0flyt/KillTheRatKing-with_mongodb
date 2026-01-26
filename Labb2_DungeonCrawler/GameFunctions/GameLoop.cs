@@ -89,7 +89,7 @@ public static class GameLoop
     {
         string PlayerName = Graphics.WriteStartScreen();
         var gameState = new GameState(PlayerName);
-        string classChoice = SelectClass();
+        var classChoice = SelectClass(gameState);
 
         gameState = SelectLevel(PlayerName, gameState);
 
@@ -111,7 +111,7 @@ public static class GameLoop
         return gameState;
     }
 
-    private static string SelectClass()
+    private static string SelectClass(GameState gameState)
     {
         var classes = GetClassesNames();
         int index = 0;
@@ -148,6 +148,8 @@ public static class GameLoop
 
         Console.ResetColor();
         Console.Clear();
+
+        gameState.ClassId = MongoConnection.MongoConnection.GetClassId(classes[index]).GetAwaiter().GetResult();
 
         return classes[index];
     }
