@@ -4,8 +4,6 @@ using Labb2_DungeonCrawler.Log;
 using Labb2_DungeonCrawler.State;
 using MongoDB.Bson.Serialization.Attributes;
 
-
-
     [BsonDiscriminator(RootClass = true)]
     [BsonKnownTypes(typeof(Player), typeof(Rat), typeof(Snake), typeof(TheRatKing), typeof(TheKingsTail), typeof(Wall), typeof(Lazer))]
 public abstract class LevelElement
