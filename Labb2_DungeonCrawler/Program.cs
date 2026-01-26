@@ -11,16 +11,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        ConsoleKeyInfo proceed;
-        do
-        {
-            Console.SetBufferSize(Console.WindowWidth, 60);
-            Graphics.WriteTitleScreen();
-            proceed = Console.ReadKey(true);
-            GameLoop.GameStart();
-            proceed = Console.ReadKey(true);
-        }
-        while (proceed.Key != ConsoleKey.Escape);
-
+        Console.SetBufferSize(Console.WindowWidth, 60);
+        GameLoop.GameStart();
     }
 }

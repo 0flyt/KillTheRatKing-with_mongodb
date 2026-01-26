@@ -14,12 +14,21 @@ namespace Labb2_DungeonCrawler.MongoConnection
         readonly static string connectionString = "mongodb://localhost:27017/";
         readonly static string dataBaseName = "KillTheRatKing";
         readonly static string saveCollectionName = "saves";
-        private static IMongoCollection<GameState> collection;
+        readonly static string classCollectionName = "classes";
+        private static IMongoCollection<GameState> saveCollection;
+        private static IMongoCollection<ClassModel> classCollection;
         static void ConnectToDB()
         {
             var client = new MongoClient(connectionString);
             var db = client.GetDatabase(dataBaseName);
-            collection = db.GetCollection<GameState>(saveCollectionName);
+            saveCollection = db.GetCollection<GameState>(saveCollectionName);
+            classCollection = db.GetCollection<ClassModel>(classCollectionName);
+        }
+        public static async Task AddClassToCollection(string newClass)
+        {
+            ConnectToDB();
+            var classModel = new ClassModel {ClassName = newClass};
+            await classCollection.InsertOneAsync(classModel);
         }
         public static async Task SaveGameToDB(GameState gameState)
         {
@@ -27,36 +36,43 @@ namespace Labb2_DungeonCrawler.MongoConnection
             var gameStateFilter = Builders<GameState>.Filter.Eq(g => g.Id, gameState.Id);
             if(gameState.Id == ObjectId.Empty || gameState.Id == default)
             {
-                await collection.InsertOneAsync(gameState);
+                await saveCollection.InsertOneAsync(gameState);
             }
-            else await collection.ReplaceOneAsync(gameStateFilter ,gameState);
-            //om filtert "returnerar" en save så replace annars insert, den här ska bara triggas när man gjort en Load
+            else await saveCollection.ReplaceOneAsync(gameStateFilter ,gameState);
         }
 
         public static async Task<GameState?> LoadGameFromDB(ObjectId id)
         {
             ConnectToDB();
             var filter = Builders<GameState>.Filter.Eq(g => g.Id, id);
-            return await collection.Find(filter).FirstOrDefaultAsync();         
+            return await saveCollection.Find(filter).FirstOrDefaultAsync();         
         }
 
         public static async Task DeleteSaveFromDB(ObjectId id)
         {
             ConnectToDB();
             var filter = Builders<GameState>.Filter.Eq(g => g.Id, id);
-            await collection.DeleteOneAsync(filter);
+            await saveCollection.DeleteOneAsync(filter);
 
         }
         public static async Task<List<SaveInfoDTO>> GetActiveSavesFromDB()
         {
             ConnectToDB();
-            return await collection
+            return await saveCollection
                             .Find(Builders<GameState>.Filter.Empty)
                             .Project(g => new SaveInfoDTO
                             {
                                 Id = g.Id,
                                 PlayerName = g.PlayerName
                             })
+                            .ToListAsync();
+        }
+        public static async Task<List<string>> GetClassesFromDB()
+        {
+            ConnectToDB();
+            return await classCollection
+                            .Find(Builders<ClassModel>.Filter.Empty)
+                            .Project(c => c.ClassName)
                             .ToListAsync();
         }
     }

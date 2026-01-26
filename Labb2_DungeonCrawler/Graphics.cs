@@ -116,7 +116,7 @@ public static class Graphics
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.DarkGray;
         string gameOver = "game over.";
-        string roundInfo = $"{player.Name} died a heroic death fighting rats and\nsnakes in {player.TurnsPlayed} turns and gained {player.XP} xp\npress [enter] to play again or [escape] to quit";
+        string roundInfo = $"{player.Name} the {player.Class} died a heroic death fighting rats and\nsnakes in {player.TurnsPlayed} turns and gained {player.XP} xp\npress [enter] to accept your faith";
         Console.SetCursorPosition(15, 10);
         foreach (var item in gameOver)
         {

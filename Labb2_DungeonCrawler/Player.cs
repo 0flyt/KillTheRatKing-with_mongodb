@@ -19,6 +19,7 @@ public class Player : LevelElement
 
     public int lastX { get; set; }
     public int lastY { get; set; }
+    public string Class { get; set; }
 
     [BsonIgnore]
     public Dictionary<ConsoleKey, int> playerDirection;
@@ -48,7 +49,7 @@ public class Player : LevelElement
         }
         Console.SetCursorPosition(0, 0);
         Console.ForegroundColor = ConsoleColor.DarkGreen;
-        string returnMessage = $"|{Symbol}: {Name} | HP: {HP} | XP: {XP}| Attack: {AttackDice} | Defence: {DefenceDice} | Turn: {TurnsPlayed} |";
+        string returnMessage = $"|{Symbol}: {Name}, {Class} | HP: {HP} | XP: {XP}| Attack: {AttackDice} | Defence: {DefenceDice} | Turn: {TurnsPlayed} |";
         Console.WriteLine(returnMessage);
         return returnMessage;
     }

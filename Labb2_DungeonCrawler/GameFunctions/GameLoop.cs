@@ -1,52 +1,61 @@
 ﻿using Labb2_DungeonCrawler.State;
 using MongoDB.Bson;
+using System.IO;
 using System.Media;
 
 namespace Labb2_DungeonCrawler;
 
 public static class GameLoop
 {
+    private static SoundPlayer musicPlayer;
+    private static string currentTrack;
+
 
     public static async Task GameStart()
     {
-        string pasteObjectIdHere = "69750f0948246dd5a0efd7cf";
-
-
-        PlayMusicLoop();
-        string userName = Graphics.WriteStartScreen();
-        bool isAlive = true;
-        int savedXP = 0;
-        int savedHP = 100;
-        ObjectId id;
-        Console.CursorVisible = false;
-        Console.WriteLine("Press [L] to load, [D] to delete save and start a new game, anything else to just start a new game");
-        var loadNewOrDelete = Console.ReadKey(true);
-        if (loadNewOrDelete.Key == ConsoleKey.D)
-        {
-            var selectedSave = SelectSaveFromList('D');
-            ConfirmSaveDelete(selectedSave);
-        }
-        if (loadNewOrDelete.Key == ConsoleKey.L)
-        {
-            var selectedSave = SelectSaveFromList('L');
-            id = selectedSave.Id;
-        }
-        else
-        {
-            id = ObjectId.Empty;
-        }
-
+        //AddNewClass("Priest");
+        //AddNewClass("Warrior");
+        //AddNewClass("Wizard");
+        //AddNewClass("Thief");
+        //AddNewClass("Cat");
         while (true)
         {
+            Graphics.WriteTitleScreen();
+            Console.ReadKey(true);
+            PlayMusicLoop("ProjectFiles\\09. Björn Petersson - Uppenbarelse.wav");
+            bool isAlive = true;
+            int savedXP = 0;
+            int savedHP = 100;
+            ObjectId id;
+            Console.CursorVisible = false;
+            Console.Clear();
+            Console.SetCursorPosition(0, 10);
+            Console.WriteLine("Press [L] to load, [D] to delete save and start a new game,\nanything else to just start a new game");
+            var loadNewOrDelete = Console.ReadKey(true);
+            if (loadNewOrDelete.Key == ConsoleKey.D)
+            {
+                var selectedSave = SelectSaveFromList('D');
+                ConfirmSaveDelete(selectedSave);
+            }
+            if (loadNewOrDelete.Key == ConsoleKey.L)
+            {
+                var selectedSave = SelectSaveFromList('L');
+                id = selectedSave.Id;
+            }
+            else
+            {
+                id = ObjectId.Empty;
+            }
+
             GameState gameState;
             Player player;
             if (id != ObjectId.Empty)
             {
-                gameState = LoadGame(id, userName);
+                gameState = LoadGame(id);
             }
             else
             {
-                gameState = StartNewGame(userName);
+                gameState = StartNewGame();
             }
 
             player = gameState.CurrentState.OfType<Player>().First();
@@ -55,34 +64,96 @@ public static class GameLoop
             player.XP = savedXP;
 
             RunGameLoop(gameState, player);
-
-            savedHP = player.HP;
-            savedXP = player.XP;
-
+            HandlePlayerDeath(player, gameState.Id);
         }
     }
 
-    private static void PlayMusicLoop()
+    private static async void AddNewClass(string newClass)
     {
-        SoundPlayer musicPlayer = new SoundPlayer("ProjectFiles\\09. Björn Petersson - Uppenbarelse.wav");
+        await MongoConnection.MongoConnection
+            .AddClassToCollection(newClass);
+    }
+    private static void PlayMusicLoop(string path)
+    {
+        if (currentTrack == path)
+            return;
+
+        musicPlayer?.Stop();
+
+        musicPlayer = new SoundPlayer(path);
         musicPlayer.PlayLooping();
+        currentTrack = path;
     }
 
-    private static GameState StartNewGame(string userName)
+    private static GameState StartNewGame()
     {
-        var gameState = new GameState(userName);
+        string PlayerName = Graphics.WriteStartScreen();
+        var gameState = new GameState(PlayerName);
+        string classChoice = SelectClass();
 
-        Graphics.WriteLevelSelect(userName);
-        LevelElement.LevelChoice(gameState);
+        gameState = SelectLevel(PlayerName, gameState);
 
-        InitGame(gameState, userName, savedHP: null, savedXP: null);
+        var player = gameState.CurrentState?
+            .OfType<Player>()
+            .FirstOrDefault()
+            ?? throw new ArgumentNullException("No player found.");
+        player.Class = classChoice;
+        player.Name = PlayerName;
+
+        InitGame(gameState, savedHP: null, savedXP: null);
 
         return gameState;
     }
+    private static GameState SelectLevel(string PlayerName,GameState gameState)
+    {
+        Graphics.WriteLevelSelect(PlayerName);
+        LevelElement.LevelChoice(gameState);
+        return gameState;
+    }
 
+    private static string SelectClass()
+    {
+        var classes = GetClassesNames();
+        int index = 0;
+        ConsoleKey key;
+        do
+        {
+            Console.Clear();
+            Console.ResetColor();
+            Console.WriteLine("select class:");
+            for (int i = 0; i < classes.Count; i++)
+            {
+                if (i == index)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($">    {classes[i]}");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"    {classes[i]}");
+                }
+            }
+
+            Console.ResetColor();
+
+            key = Console.ReadKey(true).Key;
+
+            if (key == ConsoleKey.UpArrow && index > 0)
+                index--;
+            else if (key == ConsoleKey.DownArrow && index < classes.Count - 1)
+                index++;
+
+        } while (key != ConsoleKey.Enter);
+
+        Console.ResetColor();
+        Console.Clear();
+
+        return classes[index];
+    }
 
     //SKA DEN HÄR METODEN INTEE VARA ASYNC?
-    private static GameState LoadGame(ObjectId id, string userName)
+    private static GameState LoadGame(ObjectId id)
     {
         var gameState = MongoConnection.MongoConnection.LoadGameFromDB(id).GetAwaiter().GetResult();
 
@@ -91,9 +162,17 @@ public static class GameLoop
             throw new Exception("Save not found.");
         }
 
-        InitGame(gameState, userName, savedHP: null, savedXP: null);
+
+        InitGame(gameState, savedHP: null, savedXP: null);
 
         return gameState;
+    }
+    private static List<string> GetClassesNames()
+    {
+        return MongoConnection.MongoConnection
+                                .GetClassesFromDB()
+                                .GetAwaiter()
+                                .GetResult();
     }
     private static List<SaveInfoDTO> GetSavesPlayerName()
     {
@@ -101,19 +180,18 @@ public static class GameLoop
         .GetAwaiter()
         .GetResult();
     }
-    private async static void DeleteSave(ObjectId id)
+    private async static Task DeleteSave(ObjectId id)
     {
         await MongoConnection.MongoConnection.DeleteSaveFromDB(id);
     }
 
-    private static Player InitGame(GameState gameState, string userName, int? savedHP, int? savedXP)
+    private static Player InitGame(GameState gameState, int? savedHP, int? savedXP)
     {
         var player = gameState.CurrentState?
             .OfType<Player>()
             .FirstOrDefault()
             ?? throw new ArgumentNullException("No player found.");
 
-        player.Name = userName;
         player.LoadPlayerData();
 
 
@@ -150,10 +228,16 @@ public static class GameLoop
             {
                 MongoConnection.MongoConnection.SaveGameToDB(gameState);
                 Console.Clear();
-                return;
-                //savedXP = player.XP;
-                //savedHP = player.HP;
-                //break;
+                gameState = SelectLevel(player.Name, gameState);
+                string nameHold = player.Name;
+                string classHold = player.Class;
+                player = gameState.CurrentState?
+                    .OfType<Player>()
+                    .FirstOrDefault()
+                    ?? throw new ArgumentNullException("No player found.");
+                player.Name = nameHold;
+                player.Class = classHold;
+                player = InitGame(gameState, player.HP, player.XP);
             }
 
             if (player.playerDirection.ContainsKey(menuChoice.Key) || menuChoice.Key == ConsoleKey.Z)
@@ -166,13 +250,7 @@ public static class GameLoop
             HandleDeadEnemies(gameState, player);
             DrawAll(gameState, player);
             MongoConnection.MongoConnection.SaveGameToDB(gameState);
-        }
-        ;
-
-
-
-        HandlePlayerDeath(player);
-
+        };
     }
 
     private static void DrawAll(GameState gameState, Player player)
@@ -233,11 +311,10 @@ public static class GameLoop
         gameState.CurrentState?.RemoveAll(e => e is Enemy enemy && enemy.HP <= 0);
     }
 
-    private static void HandlePlayerDeath(Player player)
+    private static async void HandlePlayerDeath(Player player, ObjectId id)
     {
-        //isAlive = false;
-        //savedXP = 0;
-        //savedHP = 100;
+        PlayMusicLoop("ProjectFiles\\03-3.wav");
+
         Graphics.WriteEndScreen(player);
 
         ConsoleKeyInfo menuChoice;
@@ -245,9 +322,9 @@ public static class GameLoop
         {
             menuChoice = Console.ReadKey(true);
         }
-        while (menuChoice.Key != ConsoleKey.Escape && menuChoice.Key != ConsoleKey.Enter);
-        if (menuChoice.Key == ConsoleKey.Enter) Console.Clear();
-        //else if (menuChoice.Key == ConsoleKey.Escape) 
+        while (menuChoice.Key != ConsoleKey.Enter);
+        
+        await DeleteSave(id);
     }
     static SaveInfoDTO SelectSaveFromList(char purpose)
     {
