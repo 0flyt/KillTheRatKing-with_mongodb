@@ -29,7 +29,6 @@ public static class GameLoop
             ObjectId id;
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Clear();
             Console.SetCursorPosition(0, 10);
             Console.WriteLine("Press [L] to load, [D] to delete save and start a new game,\nanything else to just start a new game");
             var loadNewOrDelete = Console.ReadKey(true);
