@@ -55,6 +55,7 @@ public abstract class LevelElement
 
                     elements = LevelData.Load("ProjectFiles\\Level1.txt");
                     currentGameState.SetCurrentGame(elements);
+                    currentGameState.MessageLog.MyLog.Add("loading level 1...");
 
                     validChoiceFlag = true;
                     break;
@@ -64,6 +65,7 @@ public abstract class LevelElement
 
                     elements = LevelData.Load("ProjectFiles\\Level2.txt");
                     currentGameState.SetCurrentGame(elements);
+                    currentGameState.MessageLog.MyLog.Add("loading level 2...");
 
                     validChoiceFlag = true;
                     break;
@@ -73,6 +75,7 @@ public abstract class LevelElement
 
                     elements = LevelData.Load("ProjectFiles\\Level3.txt");
                     currentGameState.SetCurrentGame(elements);
+                    currentGameState.MessageLog.MyLog.Add("loading level 3...");
 
                     validChoiceFlag = true;
                     break;
@@ -82,6 +85,7 @@ public abstract class LevelElement
 
                     elements = LevelData.Load(RandomMap.GenerateMap());
                     currentGameState.SetCurrentGame(elements);
+                    currentGameState.MessageLog.MyLog.Add("generating a random level...");
 
                     validChoiceFlag = true;
                     break;

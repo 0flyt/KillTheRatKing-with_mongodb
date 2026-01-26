@@ -185,14 +185,25 @@ public static class GameLoop
 
         foreach (var message in messages)
         {
-            Console.WriteLine(message);
+            if (message[1] == '@')
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine(message);
+            }
+            else if (message[0] == '|')
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine(message);
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.WriteLine(message);
+            }
         }
+        Console.ResetColor();
         Console.ReadKey(true);
         Console.Clear();
-    }
-    private static List<string> GetMessageLogMessages()
-    {
-        return MongoConnection.MongoConnection.GetMessageLogMessages().GetAwaiter().GetResult();
     }
     private static List<SaveInfoDTO> GetSavesPlayerName()
     {
