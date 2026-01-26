@@ -177,6 +177,23 @@ public static class GameLoop
                                 .GetAwaiter()
                                 .GetResult();
     }
+    private static void PrintMessageLog(GameState gameState)
+    {
+        Console.Clear();
+
+        var messages = gameState.MessageLog.MyLog;
+
+        foreach (var message in messages)
+        {
+            Console.WriteLine(message);
+        }
+        Console.ReadKey(true);
+        Console.Clear();
+    }
+    private static List<string> GetMessageLogMessages()
+    {
+        return MongoConnection.MongoConnection.GetMessageLogMessages().GetAwaiter().GetResult();
+    }
     private static List<SaveInfoDTO> GetSavesPlayerName()
     {
         return MongoConnection.MongoConnection.GetActiveSavesFromDB()
@@ -240,6 +257,12 @@ public static class GameLoop
                 player.Name = nameHold;
                 player.Class = classHold;
                 player = InitGame(gameState, player.HP, player.XP);
+            }
+
+            if (menuChoice.Key == ConsoleKey.L)
+            {
+                PrintMessageLog(gameState);
+                player.PrintUnitInfo();
             }
 
             if (player.playerDirection.ContainsKey(menuChoice.Key) || menuChoice.Key == ConsoleKey.Z)

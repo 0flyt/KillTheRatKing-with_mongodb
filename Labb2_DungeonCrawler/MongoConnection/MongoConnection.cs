@@ -67,6 +67,14 @@ namespace Labb2_DungeonCrawler.MongoConnection
                             })
                             .ToListAsync();
         }
+        public static async Task<List<string>> GetMessageLogMessages()
+        {
+            ConnectToDB();
+            return await saveCollection
+                            .Find(Builders<GameState>.Filter.Empty)
+                            .Project(g => g.MessageLog.MyLog)
+                            .FirstOrDefaultAsync();
+        }
         public static async Task<List<string>> GetClassesFromDB()
         {
             ConnectToDB();
