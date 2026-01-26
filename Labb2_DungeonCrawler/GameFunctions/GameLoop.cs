@@ -63,6 +63,8 @@ public static class GameLoop
             player.HP = savedHP;
             player.XP = savedXP;
 
+            SaveToDb(gameState);
+
             RunGameLoop(gameState, player);
             HandlePlayerDeath(player, gameState.Id);
         }
@@ -154,7 +156,6 @@ public static class GameLoop
         return classes[index];
     }
 
-    //SKA DEN HÄR METODEN INTEE VARA ASYNC?
     private static GameState LoadGame(ObjectId id)
     {
         var gameState = MongoConnection.MongoConnection.LoadGameFromDB(id).GetAwaiter().GetResult();
@@ -223,12 +224,11 @@ public static class GameLoop
     {
         while (player.HP > 0)
         {
-
             Graphics.WriteInfo();
             var menuChoice = Console.ReadKey(true);
             if (menuChoice.Key == ConsoleKey.Escape)
             {
-                MongoConnection.MongoConnection.SaveGameToDB(gameState);
+                SaveToDb(gameState);
                 Console.Clear();
                 gameState = SelectLevel(player.Name, gameState);
                 string nameHold = player.Name;
@@ -251,8 +251,16 @@ public static class GameLoop
             UpdateEnemies(gameState);
             HandleDeadEnemies(gameState, player);
             DrawAll(gameState, player);
-            MongoConnection.MongoConnection.SaveGameToDB(gameState);
+            if (player.TurnsPlayed % 10 == 0)
+            {
+                SaveToDb(gameState);
+            }
         };
+    }
+
+    private static void SaveToDb(GameState gameState)
+    {
+        MongoConnection.MongoConnection.SaveGameToDB(gameState).GetAwaiter().GetResult();
     }
 
     private static void DrawAll(GameState gameState, Player player)
