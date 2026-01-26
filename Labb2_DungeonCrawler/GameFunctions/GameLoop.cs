@@ -29,7 +29,6 @@ public static class GameLoop
             ObjectId id;
             Console.CursorVisible = false;
             Console.Clear();
-            ShowHighScore();
             Console.ReadKey(true);
             Console.Clear();
             Console.SetCursorPosition(0, 10);
@@ -65,19 +64,34 @@ public static class GameLoop
 
             player.HP = savedHP;
             player.XP = savedXP;
+            gameState.XpScore = savedXP;
             
             SaveToDb(gameState);
 
             RunGameLoop(gameState, player);
-            HandlePlayerDeath(player, gameState.Id);
+            HandlePlayerDeath(player, id, gameState);
+            ShowHighScore(gameState);
+            Console.ReadKey(true);
         }
     }
 
-    private static async void ShowHighScore()
+    private static async void ShowHighScore(GameState gameState)
     {
-        var highscores = await MongoConnection.MongoConnection.GetHighScoreFromDB();
+        var player = gameState.CurrentState?.OfType<Player>().FirstOrDefault();
+        var highScoresDead = await MongoConnection.MongoConnection.GetHighScoreFromDB();
+        var highScoresAlive = await MongoConnection.MongoConnection.GetActiveSavesFromDB();
 
-        Graphics.PrintHighScore(highscores);
+        var collectedHighScore = new List<HighScore>();
+
+        collectedHighScore = highScoresDead;
+
+        foreach (var item in highScoresAlive)
+        {
+            collectedHighScore.Add(new HighScore { IsAlive = true, PlayerName = item.PlayerName, Score = item.PlayerXp });
+        }
+
+        var sortedHighScore = collectedHighScore.OrderByDescending(s => s.Score).Take(10).ToList();
+        Graphics.PrintHighScore(sortedHighScore);
         //foreach (var score in highscores)
         //{
         //    Console.WriteLine($"{score.PlayerName} {score.Score}");
@@ -354,22 +368,25 @@ public static class GameLoop
         foreach (var rat in deadRats)
         {
             player.XP += 23;
+            gameState.XpScore += 23;
         }
         var deadSneaks = gameState.CurrentState?.OfType<Snake>().Where(e => e.HP <= 0).ToList() ?? new List<Snake>();
         foreach (var snake in deadSneaks)
         {
             player.XP += 57;
+            gameState.XpScore += 57;
         }
         var deadKings = gameState.CurrentState?.OfType<TheRatKing>().Where(e => e.HP <= 0).ToList() ?? new List<TheRatKing>();
         foreach (var king in deadKings)
         {
             player.XP += 132;
+            gameState.XpScore += 132;
         }
 
         gameState.CurrentState?.RemoveAll(e => e is Enemy enemy && enemy.HP <= 0);
     }
 
-    private static void HandlePlayerDeath(Player player, ObjectId id)
+    private static async Task HandlePlayerDeath(Player player, ObjectId id, GameState gameState)
     {
         await MongoConnection.MongoConnection.SaveHighScore(player.Name, player.XP);
         PlayMusicLoop("ProjectFiles\\03-3.wav");

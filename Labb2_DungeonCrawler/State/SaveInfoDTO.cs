@@ -11,5 +11,6 @@ namespace Labb2_DungeonCrawler.State
     {
         public ObjectId Id { get; set; }
         public string PlayerName { get; set; } = "";
+        public int PlayerXp { get; set; } = 0;
     }
 }

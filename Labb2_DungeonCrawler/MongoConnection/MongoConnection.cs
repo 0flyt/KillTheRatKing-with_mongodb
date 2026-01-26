@@ -31,7 +31,7 @@ namespace Labb2_DungeonCrawler.MongoConnection
         public static async Task SaveHighScore( string playerName, int score)
         {
             ConnectToDB();
-            var scoreModel = new HighScore { PlayerName = playerName, Score = score };
+            var scoreModel = new HighScore { PlayerName = playerName, Score = score, IsAlive = false };
             await highScoreCollection.InsertOneAsync(scoreModel);
 
         }
@@ -91,7 +91,8 @@ namespace Labb2_DungeonCrawler.MongoConnection
                             .Project(g => new SaveInfoDTO
                             {
                                 Id = g.Id,
-                                PlayerName = g.PlayerName
+                                PlayerName = g.PlayerName,
+                                PlayerXp = g.XpScore
                             })
                             .ToListAsync();
         }

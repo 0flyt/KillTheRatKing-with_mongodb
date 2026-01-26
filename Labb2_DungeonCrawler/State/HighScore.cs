@@ -12,5 +12,6 @@ namespace Labb2_DungeonCrawler.State
         public ObjectId Id { get; set; }
         public string PlayerName { get; set; }
         public int Score { get; set; }
+        public bool IsAlive { get; set; }
     }
 }

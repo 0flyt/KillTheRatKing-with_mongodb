@@ -24,10 +24,11 @@ public static class Graphics
         Console.Clear();
         Console.SetCursorPosition(20, 7);
         Console.WriteLine("Highscore:");
+        
         for (int i = 0; i < highScores.Count; i++)
         {
             Console.SetCursorPosition(20, 10 + i);
-            Console.WriteLine($"{i + 1}: {highScores[i].PlayerName} {highScores[i].Score}");
+            Console.WriteLine($"{i + 1}: {highScores[i].PlayerName} {highScores[i].Score} {(highScores[i].IsAlive ? "Alive" : "Dead")}");
         }
 
     }
