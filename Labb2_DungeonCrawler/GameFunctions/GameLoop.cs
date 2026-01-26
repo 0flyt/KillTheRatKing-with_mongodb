@@ -1,24 +1,15 @@
-﻿using Labb2_DungeonCrawler.Log;
-using Labb2_DungeonCrawler.State;
-using Labb2_DungeonCrawler.MongoConnection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Media;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
+﻿using Labb2_DungeonCrawler.State;
 using MongoDB.Bson;
+using System.Media;
 
 namespace Labb2_DungeonCrawler;
 
 public static class GameLoop
 {
 
-    public static void GameStart()
+    public static async Task GameStart()
     {
-        string pasteObjectIdHere = "697511ede35f016ff860393e";
+        string pasteObjectIdHere = "69750f0948246dd5a0efd7cf";
 
 
         PlayMusicLoop();
@@ -29,14 +20,16 @@ public static class GameLoop
         ObjectId id;
         Console.CursorVisible = false;
         Console.WriteLine("Press [L] to load, [D] to delete save and start a new game, anything else to just start a new game");
-        var loadOrNew = Console.ReadKey(true);
-        if (loadOrNew.Key == ConsoleKey.D)
+        var loadNewOrDelete = Console.ReadKey(true);
+        if (loadNewOrDelete.Key == ConsoleKey.D)
         {
-            DeleteSave(ObjectId.Parse(pasteObjectIdHere));
+            var selectedSave = SelectSaveFromList('D');
+            ConfirmSaveDelete(selectedSave);
         }
-        if (loadOrNew.Key == ConsoleKey.L)
+        if (loadNewOrDelete.Key == ConsoleKey.L)
         {
-            id = ObjectId.Parse(pasteObjectIdHere);
+            var selectedSave = SelectSaveFromList('L');
+            id = selectedSave.Id;
         }
         else
         {
@@ -54,7 +47,7 @@ public static class GameLoop
             else
             {
                 gameState = StartNewGame(userName);
-            } 
+            }
 
             player = gameState.CurrentState.OfType<Player>().First();
 
@@ -102,6 +95,12 @@ public static class GameLoop
 
         return gameState;
     }
+    private static List<SaveInfoDTO> GetSavesPlayerName()
+    {
+        return MongoConnection.MongoConnection.GetActiveSavesFromDB()
+        .GetAwaiter()
+        .GetResult();
+    }
     private async static void DeleteSave(ObjectId id)
     {
         await MongoConnection.MongoConnection.DeleteSaveFromDB(id);
@@ -111,7 +110,7 @@ public static class GameLoop
     {
         var player = gameState.CurrentState?
             .OfType<Player>()
-            .FirstOrDefault() 
+            .FirstOrDefault()
             ?? throw new ArgumentNullException("No player found.");
 
         player.Name = userName;
@@ -167,7 +166,8 @@ public static class GameLoop
             HandleDeadEnemies(gameState, player);
             DrawAll(gameState, player);
             MongoConnection.MongoConnection.SaveGameToDB(gameState);
-        };
+        }
+        ;
 
 
 
@@ -248,5 +248,74 @@ public static class GameLoop
         while (menuChoice.Key != ConsoleKey.Escape && menuChoice.Key != ConsoleKey.Enter);
         if (menuChoice.Key == ConsoleKey.Enter) Console.Clear();
         //else if (menuChoice.Key == ConsoleKey.Escape) 
+    }
+    static SaveInfoDTO SelectSaveFromList(char purpose)
+    {
+        var saves = GetSavesPlayerName();
+        int index = 0;
+        ConsoleKey key;
+        var selectedColor = new ConsoleColor();
+        var notSelectedColor = new ConsoleColor();
+        if (purpose == 'D')
+        {
+            notSelectedColor = ConsoleColor.Green;
+            selectedColor = ConsoleColor.Red;
+        }
+        else
+        {
+            notSelectedColor = ConsoleColor.Red;
+            selectedColor = ConsoleColor.Green;
+        }
+        do
+        {
+            Console.Clear();
+
+            for (int i = 0; i < saves.Count; i++)
+            {
+                if (i == index)
+                {
+                    Console.ForegroundColor = selectedColor;
+                    Console.WriteLine($">    {saves[i].PlayerName}, {saves[i].Id.ToString().Substring(saves[i].Id.ToString().Length - 5)}");
+                }
+                else
+                {
+                    Console.ForegroundColor = notSelectedColor;
+                    Console.WriteLine($"    {saves[i].PlayerName}, {saves[i].Id.ToString().Substring(saves[i].Id.ToString().Length - 5)}");
+                }
+            }
+
+            Console.ResetColor();
+
+            key = Console.ReadKey(true).Key;
+
+            if (key == ConsoleKey.UpArrow && index > 0)
+                index--;
+            else if (key == ConsoleKey.DownArrow && index < saves.Count - 1)
+                index++;
+
+        } while (key != ConsoleKey.Enter);
+
+        Console.ResetColor();
+        Console.Clear();
+
+        return saves[index];
+    }
+    static void ConfirmSaveDelete(SaveInfoDTO selectedSave)
+    {
+        var key = new ConsoleKey();
+        Console.Clear();
+        Console.SetCursorPosition(15, 10);
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"are you sure you want to delete {selectedSave.PlayerName}?\n                         [Y]es | [N]o");
+        do
+        {
+            key = Console.ReadKey(true).Key;
+        }
+        while (key != ConsoleKey.Y && key != ConsoleKey.N);
+        if (key == ConsoleKey.Y)
+        {
+            DeleteSave(selectedSave.Id);        
+        }
+        Console.ResetColor();
     }
 }

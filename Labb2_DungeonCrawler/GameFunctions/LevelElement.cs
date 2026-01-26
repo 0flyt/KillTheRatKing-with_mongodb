@@ -158,8 +158,13 @@ public abstract class LevelElement
             Console.SetCursorPosition(0, 1);
 
             PrintFightresult(Fight(collider), collider, player);
-            if (collider.HP > 0) 
+            if (collider.HP > 0)
+            {
+                Console.SetCursorPosition(0, 2);
+                Console.Write(new string(' ', Console.WindowWidth));
+                Console.SetCursorPosition(0, 2);
                 collider.PrintFightresult(collider.Fight(this), this, player);
+            }
 
             Game.MessageLog.MyLog.Add(PrintUnitInfo());
             Game.MessageLog.MyLog.Add(collider.PrintUnitInfo());
