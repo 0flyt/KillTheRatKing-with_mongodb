@@ -252,7 +252,7 @@ public static class GameLoop
         Console.Clear();
 
         var logMessage = player.PrintUnitInfo();
-        gameState.MessageLog.MyLog.Add(logMessage);
+        //gameState.MessageLog.MyLog.Add(logMessage);
 
         UpdateWalls(gameState);
         DrawAll(gameState, player);
