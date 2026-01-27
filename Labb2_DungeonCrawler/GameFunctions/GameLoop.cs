@@ -23,9 +23,6 @@ public static class GameLoop
             Graphics.WriteTitleScreen();
             Console.ReadKey(true);
             PlayMusicLoop("ProjectFiles\\09. Björn Petersson - Uppenbarelse.wav");
-            bool isAlive = true;
-            int savedXP = -1;
-            int savedHP = -1;
             ObjectId id;
             Console.CursorVisible = false;
             Console.Clear();
