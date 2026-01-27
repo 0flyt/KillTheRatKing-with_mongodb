@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Labb2_DungeonCrawler.State
+{
+    public class LevelModel
+    {
+        public string Name { get; set; }
+        public int AliveEnemies { get; set; }
+        public int DeadEnemies { get; set; }
+        public List<LevelElement> Elements { get; set; }
+        public bool IsAccessable { get; set; }
+    }
+}
