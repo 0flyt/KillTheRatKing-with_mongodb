@@ -28,12 +28,12 @@ public static class GameLoop
             var loadNewOrDelete = Console.ReadKey(true);
             if (loadNewOrDelete.Key == ConsoleKey.D)
             {
-                var selectedSave = SelectSaveFromList('D');
-                ConfirmSaveDelete(selectedSave);
+                var selectedSave = await SelectSaveFromList('D');
+                await ConfirmSaveDelete(selectedSave);
             }
             if (loadNewOrDelete.Key == ConsoleKey.L)
             {
-                var selectedSave = SelectSaveFromList('L');
+                var selectedSave = await SelectSaveFromList('L');
                 id = selectedSave.Id;
             }
             else
@@ -45,18 +45,18 @@ public static class GameLoop
             Player player;
             if (id != ObjectId.Empty)
             {
-                gameState = LoadGame(id);
+                gameState = await LoadGame(id);
             }
             else
             {
-                gameState = StartNewGame();
+                gameState = await StartNewGame();
             }
 
             player = gameState.CurrentState.OfType<Player>().First();
 
             gameState.XpScore = player.XP;
 
-            ShowHighScore(gameState);
+            await ShowHighScore(gameState);
             Console.ReadKey(true);
             Console.Clear();
             
@@ -67,11 +67,11 @@ public static class GameLoop
         }
     }
 
-    private static void ShowHighScore(GameState gameState)
+    private static async Task ShowHighScore(GameState gameState)
     {
         var player = gameState.CurrentState?.OfType<Player>().FirstOrDefault();
-        var highScoresDead = MongoConnection.MongoConnection.GetHighScoreFromDB().GetAwaiter().GetResult();
-        var highScoresAlive = MongoConnection.MongoConnection.GetActiveSavesFromDB().GetAwaiter().GetResult();
+        var highScoresDead = await MongoConnection.MongoConnection.GetHighScoreFromDB();
+        var highScoresAlive = await MongoConnection.MongoConnection.GetActiveSavesFromDB();
 
         var collectedHighScore = new List<HighScore>();
 
@@ -116,11 +116,11 @@ public static class GameLoop
         musicTrack?.Dispose();
     }
 
-    private static GameState StartNewGame()
+    private static async Task<GameState> StartNewGame()
     {
         string PlayerName = Graphics.WriteStartScreen();
         var gameState = new GameState(PlayerName);
-        var classChoice = SelectClass(gameState);
+        var classChoice = await SelectClass(gameState);
 
         gameState = SelectLevel(PlayerName, gameState);
 
@@ -142,9 +142,9 @@ public static class GameLoop
         return gameState;
     }
 
-    private static string SelectClass(GameState gameState)
+    private static async Task<string> SelectClass(GameState gameState)
     {
-        var classes = GetClassesNames();
+        var classes = await GetClassesNames();
         int index = 0;
         ConsoleKey key;
         do
@@ -180,14 +180,14 @@ public static class GameLoop
         Console.ResetColor();
         Console.Clear();
 
-        gameState.ClassId = MongoConnection.MongoConnection.GetClassId(classes[index]).GetAwaiter().GetResult();
+        gameState.ClassId = await MongoConnection.MongoConnection.GetClassId(classes[index]);
 
         return classes[index];
     }
 
-    private static GameState LoadGame(ObjectId id)
+    private static async Task<GameState> LoadGame(ObjectId id)
     {
-        var gameState = MongoConnection.MongoConnection.LoadGameFromDB(id).GetAwaiter().GetResult();
+        var gameState = await MongoConnection.MongoConnection.LoadGameFromDB(id);
 
         if (gameState == null)
         {
@@ -199,12 +199,9 @@ public static class GameLoop
 
         return gameState;
     }
-    private static List<string> GetClassesNames()
+    private static async Task<List<string>> GetClassesNames()
     {
-        return MongoConnection.MongoConnection
-                                .GetClassesFromDB()
-                                .GetAwaiter()
-                                .GetResult();
+        return await MongoConnection.MongoConnection.GetClassesFromDB();
     }
     private static void PrintMessageLog(GameState gameState)
     {
@@ -234,11 +231,9 @@ public static class GameLoop
         Console.ReadKey(true);
         Console.Clear();
     }
-    private static List<SaveInfoDTO> GetSavesPlayerName()
+    private static Task<List<SaveInfoDTO>> GetSavesPlayerName()
     {
-        return MongoConnection.MongoConnection.GetActiveSavesFromDB()
-        .GetAwaiter()
-        .GetResult();
+        return MongoConnection.MongoConnection.GetActiveSavesFromDB();
     }
     private async static Task DeleteSave(ObjectId id)
     {
@@ -383,9 +378,9 @@ public static class GameLoop
         gameState.CurrentState?.RemoveAll(e => e is Enemy enemy && enemy.HP <= 0);
     }
 
-    private static void HandlePlayerDeath(Player player, ObjectId id, GameState gameState)
+    private static async Task HandlePlayerDeath(Player player, ObjectId id, GameState gameState)
     {
-        MongoConnection.MongoConnection.SaveHighScore(player.Name, player.XP).GetAwaiter().GetResult();
+        await MongoConnection.MongoConnection.SaveHighScore(player.Name, player.XP);
         DeleteSave(id).GetAwaiter().GetResult();
         PlayMusicLoop("ProjectFiles\\03-3.wav");
 
@@ -400,9 +395,9 @@ public static class GameLoop
         
 
     }
-    static SaveInfoDTO SelectSaveFromList(char purpose)
+    static async Task<SaveInfoDTO> SelectSaveFromList(char purpose)
     {
-        var saves = GetSavesPlayerName();
+        var saves = await GetSavesPlayerName();
         int index = 0;
         ConsoleKey key;
         var selectedColor = new ConsoleColor();
@@ -451,7 +446,7 @@ public static class GameLoop
 
         return saves[index];
     }
-    static void ConfirmSaveDelete(SaveInfoDTO selectedSave)
+    static async Task ConfirmSaveDelete(SaveInfoDTO selectedSave)
     {
         var key = new ConsoleKey();
         Console.Clear();
@@ -465,7 +460,7 @@ public static class GameLoop
         while (key != ConsoleKey.Y && key != ConsoleKey.N);
         if (key == ConsoleKey.Y)
         {
-            DeleteSave(selectedSave.Id).GetAwaiter().GetResult();        
+            await DeleteSave(selectedSave.Id);        
         }
         Console.ResetColor();
     }
