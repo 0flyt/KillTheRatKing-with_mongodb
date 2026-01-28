@@ -157,7 +157,6 @@ public abstract class LevelElement
 
         if (collider is not Wall && !(collider is Enemy && this is Enemy))
         {
-            player.PlaySound("ProjectFiles\\grunt.wav", 0.5f);
             Console.SetCursorPosition(0, 1);
             Console.Write(new string(' ', Console.WindowWidth));
 
