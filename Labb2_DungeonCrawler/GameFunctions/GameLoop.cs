@@ -13,7 +13,7 @@ public static class GameLoop
     private static string currentTrack;
 
 
-    public static void GameStart()
+    public static async Task GameStart()
     {
         while (true)
         {
@@ -60,9 +60,9 @@ public static class GameLoop
             Console.ReadKey(true);
             Console.Clear();
             
-            SaveToDb(gameState);
+            await SaveToDb(gameState);
 
-            RunGameLoop(gameState, player);
+            await RunGameLoop(gameState, player);
             HandlePlayerDeath(player, id, gameState);
         }
     }
@@ -96,14 +96,16 @@ public static class GameLoop
         musicTrack = new AudioFileReader(path);
         musicPlayer = new WaveOutEvent();
 
+        musicPlayer.Init(musicTrack);
+        musicPlayer.Play();
+
         musicPlayer.PlaybackStopped += (s, e) =>
         {
+            musicPlayer.Init(musicTrack);
             musicTrack.Position = 0;
             musicPlayer.Play();
         };
 
-        musicPlayer.Init(musicTrack);
-        musicPlayer.Play();
 
         currentTrack = path;
     }
@@ -267,7 +269,7 @@ public static class GameLoop
         return player;
     }
 
-    private static void RunGameLoop(GameState gameState, Player player)
+    private static async Task RunGameLoop(GameState gameState, Player player)
     {
         while (player.HP > 0)
         {
@@ -275,7 +277,7 @@ public static class GameLoop
             var menuChoice = Console.ReadKey(true);
             if (menuChoice.Key == ConsoleKey.Escape)
             {
-                SaveToDb(gameState);
+                await SaveToDb(gameState);
                 Console.Clear();
                 int hpHold = player.HP;
                 int xpHold = player.XP;
@@ -310,14 +312,14 @@ public static class GameLoop
             DrawAll(gameState, player);
             if (player.TurnsPlayed % 10 == 0)
             {
-                SaveToDb(gameState);
+                await SaveToDb(gameState);
             }
         };
     }
 
-    private static void SaveToDb(GameState gameState)
+    private static async Task SaveToDb(GameState gameState)
     {
-        MongoConnection.MongoConnection.SaveGameToDB(gameState).GetAwaiter().GetResult();
+        await MongoConnection.MongoConnection.SaveGameToDB(gameState);
     }
 
     private static void DrawAll(GameState gameState, Player player)

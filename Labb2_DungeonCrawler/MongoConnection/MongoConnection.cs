@@ -12,7 +12,7 @@ namespace Labb2_DungeonCrawler.MongoConnection
     public static class MongoConnection
     {
         readonly static string connectionString = "mongodb://localhost:27017/";
-        readonly static string dataBaseName = "KillTheRatKing";
+        readonly static string dataBaseName = "BjornPeterssonChristopherRydberg";
         readonly static string saveCollectionName = "saves";
         readonly static string classCollectionName = "classes";
         readonly static string highScoreCollectionName = "highscore";

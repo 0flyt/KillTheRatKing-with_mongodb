@@ -9,9 +9,9 @@ namespace Labb2_DungeonCrawler;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         Console.SetBufferSize(Console.WindowWidth, 60);
-        GameLoop.GameStart();
+        await GameLoop.GameStart();
     }
 }
