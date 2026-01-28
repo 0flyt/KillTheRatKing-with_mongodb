@@ -16,6 +16,7 @@ namespace Labb2_DungeonCrawler.State
         public string PlayerName { get; set; }
         public ObjectId ClassId { get; set; }
         public int XpScore { get; set; }
+        public string ActiveLevel { get; set; }
         public MessageLog MessageLog { get; set; }
         public List<LevelElement> CurrentState { get; set; }  
         public GameState(string userName)

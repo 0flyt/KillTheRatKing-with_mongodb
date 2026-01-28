@@ -92,7 +92,8 @@ namespace Labb2_DungeonCrawler.MongoConnection
                             {
                                 Id = g.Id,
                                 PlayerName = g.PlayerName,
-                                PlayerXp = g.XpScore
+                                PlayerXp = g.XpScore,
+                                AktiveLevelName = g.ActiveLevel
                             })
                             .ToListAsync();
         }

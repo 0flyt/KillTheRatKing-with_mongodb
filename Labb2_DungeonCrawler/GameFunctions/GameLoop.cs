@@ -416,12 +416,12 @@ public static class GameLoop
                 if (i == index)
                 {
                     Console.ForegroundColor = selectedColor;
-                    Console.WriteLine($">    {saves[i].PlayerName}, {saves[i].Id.ToString().Substring(saves[i].Id.ToString().Length - 5)}");
+                    Console.WriteLine($">    {saves[i].PlayerName}, level {saves[i].AktiveLevelName}, {saves[i].PlayerXp} xp, {saves[i].Id.ToString().Substring(saves[i].Id.ToString().Length - 5)}");
                 }
                 else
                 {
                     Console.ForegroundColor = notSelectedColor;
-                    Console.WriteLine($"    {saves[i].PlayerName}, {saves[i].Id.ToString().Substring(saves[i].Id.ToString().Length - 5)}");
+                    Console.WriteLine($"    {saves[i].PlayerName}, level {saves[i].AktiveLevelName}, {saves[i].PlayerXp} xp, {saves[i].Id.ToString().Substring(saves[i].Id.ToString().Length - 5)}");
                 }
             }
 

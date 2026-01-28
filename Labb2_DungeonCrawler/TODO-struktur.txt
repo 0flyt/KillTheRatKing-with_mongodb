@@ -9,3 +9,5 @@ Möjlighet att spela utan musik
 
 
 -Om topplistan buggar, rensa collectionen
+
+-Det buggar när man fullscreenar och stänger loggen
