@@ -26,15 +26,29 @@ public static class GameLoop
 
             var saves = await GetSavesPlayerName();
             bool hasSaves = saves.Any();
+            List<string> mainMenuOptions;
+            int mainChoice;
 
-            var mainMenuOptions = new List<string>
+            if (hasSaves)
             {
-                "Continue",
-                "Load Save",
-                "New Game",
-                "High Score"
-            };
-            int mainChoice = MenuHelper.ShowMenu("=== MAIN MENU ===", mainMenuOptions);
+                mainMenuOptions = new List<string>
+                {
+                    "New Game",
+                    "High Score",
+                    "Continue",
+                    "Load Save"
+                };
+                mainChoice = MenuHelper.ShowMenu("=== MAIN MENU ===", mainMenuOptions, 2);
+            }
+            else
+            {
+                mainMenuOptions = new List<string>
+                {
+                    "New Game",
+                    "High Score"
+                };
+                mainChoice = MenuHelper.ShowMenu("=== MAIN MENU ===", mainMenuOptions);
+            }
 
             ObjectId id = ObjectId.Empty;
 
@@ -48,6 +62,14 @@ public static class GameLoop
                 case -1: continue;
 
                 case 0:
+                    id = ObjectId.Empty;
+                    break;
+
+                case 1:
+                    await ShowHighScore();
+                    continue;
+                    
+                case 2:
                     if (!hasSaves)
                     {
                         Console.Clear();
@@ -58,19 +80,11 @@ public static class GameLoop
                     id = saves.First().Id;
                     break;
 
-                case 1:
+                case 3:
                     var selectedSave = await SelectSaveFromList();
                     if (selectedSave == null) continue;
                     id = selectedSave.Id;
                     break;
-
-                case 2:
-                    id = ObjectId.Empty;
-                    break;
-
-                case 3:
-                    await ShowHighScore();
-                    continue;
 
                 default:
                     continue;

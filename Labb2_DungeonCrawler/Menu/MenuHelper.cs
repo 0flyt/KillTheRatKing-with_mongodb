@@ -8,9 +8,9 @@ namespace Labb2_DungeonCrawler.Menu;
 
 public static class MenuHelper
 {
-    public static int ShowMenu(string title, List<string> options, bool allowEscape = true)
+    public static int ShowMenu(string title, List<string> options, int startIndex = 0, bool allowEscape = true)
     {
-        int index = 0;
+        int index = startIndex;
         ConsoleKey key;
 
         do
