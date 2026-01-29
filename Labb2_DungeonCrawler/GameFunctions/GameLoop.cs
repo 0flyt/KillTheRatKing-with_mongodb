@@ -27,14 +27,15 @@ public static class GameLoop
             var saves = await GetSavesPlayerName();
             bool hasSaves = saves.Any();
 
-            var mainMenuOptions = new List<string>
+            var menuOptions = new List<MenuOption>
             {
-                "Continue",
-                "Load Save",
-                "New Game",
-                "High Score"
+                new MenuOption("Continue", hasSaves),
+                new MenuOption("Load Save", hasSaves),
+                new MenuOption("New Game", true),
+                new MenuOption("High Score", true)
             };
-            int mainChoice = MenuHelper.ShowMenu("=== MAIN MENU ===", mainMenuOptions);
+
+            int mainChoice = MenuHelper.ShowMenu("Main Menu", menuOptions);
 
             ObjectId id = ObjectId.Empty;
 
@@ -46,34 +47,17 @@ public static class GameLoop
             switch (mainChoice)
             {
                 case -1: continue;
-
-                case 0:
-                    if (!hasSaves)
-                    {
-                        Console.Clear();
-                        Console.WriteLine("No save!");
-                        Console.ReadKey(true);
-                        continue;
-                    }
-                    id = saves.First().Id;
-                    break;
-
+                case 0: id = saves.First().Id; break;
                 case 1:
-                    var selectedSave = await SelectSaveFromList();
-                    if (selectedSave == null) continue;
-                    id = selectedSave.Id;
-                    break;
+                    {
+                        var selectedSave = await SelectSaveFromList();
+                        if (selectedSave == null) continue;
+                        id = selectedSave.Id;
+                        break;
+                    }
 
-                case 2:
-                    id = ObjectId.Empty;
-                    break;
-
-                case 3:
-                    await ShowHighScore();
-                    continue;
-
-                default:
-                    continue;
+                case 2: id = ObjectId.Empty; break;
+                case 3: await ShowHighScore(); continue;
             }
 
             var loadNewOrDelete = Console.ReadKey(true);
@@ -474,7 +458,7 @@ public static class GameLoop
             return null;
         }
 
-        var options = saves.Select(s => $"{s.PlayerName}, level {s.AktiveLevelName}, {s.PlayerXp} xp").ToList();
+        var options = saves.Select(s => new MenuOption($"{s.PlayerName}, level {s.AktiveLevelName}, {s.PlayerXp} xp", isEnabled: true)).ToList();
 
         int selectedIndex = MenuHelper.ShowMenu("Select save:", options);
         if (selectedIndex == -1) return null;

@@ -8,33 +8,51 @@ namespace Labb2_DungeonCrawler.Menu;
 
 public static class MenuHelper
 {
-    public static int ShowMenu(string title, List<string> options, bool allowEscape = true)
+    public static int ShowMenu(string title, List<MenuOption> options, bool allowEscape = true)
     {
         int index = 0;
         ConsoleKey key;
 
+        index = options.FindIndex(o => o.IsEnabled);
+        if (index == -1) return -1;
+
         do
         {
             Console.Clear();
+            Console.ResetColor();
             Console.WriteLine(title);
             Console.WriteLine();
 
             for (int i = 0; i < options.Count; i++)
             {
-                if (i == index)
-                    Console.ForegroundColor = ConsoleColor.Green;
-                else
-                    Console.ForegroundColor = ConsoleColor.Gray;
+                var option = options[i];
 
-                Console.WriteLine((i == index ? "> " : "  ") + options[i]);
+                if (i == index)
+                    Console.ForegroundColor = option.IsEnabled ? ConsoleColor.Green : ConsoleColor.DarkGray;
+                else
+                    Console.ForegroundColor = option.IsEnabled ? ConsoleColor.Gray : ConsoleColor.DarkGray;
+
+                Console.WriteLine((i == index ? "> " : "  ") + option.Text);
             }
 
             Console.ResetColor();
 
             key = Console.ReadKey(true).Key;
 
-            if (key == ConsoleKey.UpArrow && index > 0) index--;
-            if (key == ConsoleKey.DownArrow && index < options.Count - 1) index++;
+            if (key == ConsoleKey.UpArrow)
+            {
+                do
+                {
+                    index = (index == 0) ? options.Count - 1 : index - 1;
+                } while (!options[index].IsEnabled);
+            }
+            else if (key == ConsoleKey.DownArrow)
+            {
+                do
+                {
+                    index = (index == options.Count - 1) ? 0 : index + 1;
+                } while (!options[index].IsEnabled);
+            }
 
             if (allowEscape && key == ConsoleKey.Escape)
                 return -1;
