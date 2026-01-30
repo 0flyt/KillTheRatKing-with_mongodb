@@ -61,21 +61,21 @@ public abstract class LevelElement
                 break;
             case 0:
                 gameState.SetCurrentGame(levels[index].Elements);
-                gameState.MessageLog.MyLog.Add("loading level 1...");
+                gameState.MessageLog.MyLog.Add($"loading {levels[index].Name.ToLower()}...");
                 gameState.ActiveLevel = "1";
                 levels[index + 1].IsAccessable = true;
                 break;
 
             case 1:
                 gameState.SetCurrentGame(levels[index].Elements);
-                gameState.MessageLog.MyLog.Add("loading level 2...");
+                gameState.MessageLog.MyLog.Add($"loading {levels[index].Name.ToLower()}...");
                 gameState.ActiveLevel = "2";
                 levels[index + 1].IsAccessable = true;
                 break;
 
             case 2:
                 gameState.SetCurrentGame(levels[index].Elements);
-                gameState.MessageLog.MyLog.Add("loading level 3...");
+                gameState.MessageLog.MyLog.Add($"loading {levels[index].Name.ToLower()}...");
                 gameState.ActiveLevel = "3";
                 break;
 
