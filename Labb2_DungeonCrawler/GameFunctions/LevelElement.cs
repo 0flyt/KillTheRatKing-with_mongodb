@@ -46,37 +46,20 @@ public abstract class LevelElement
             options.Add(new MenuOption(levels[i].Name, levels[i].IsAccessable));
         }
         options.Add(new MenuOption("Generate level"));
-        
-            //{
-        //    new MenuOption("Level 1"),
-        //    new MenuOption("Level 2"),
-        //    new MenuOption("Level 3"),
-        //    new MenuOption("Generate level")
-        //};
-        int index = MenuHelper.ShowMenu($"=== {playerName} ===", options);
+
+        int index = MenuHelper.ShowMenu($"=== {playerName} ===", options, false);
 
         switch (index)
         {
             case -1:
                 break;
             case 0:
-                gameState.SetCurrentGame(levels[index].Elements);
-                gameState.MessageLog.MyLog.Add($"loading {levels[index].Name.ToLower()}...");
-                gameState.ActiveLevel = "1";
-                levels[index + 1].IsAccessable = true;
-                break;
-
             case 1:
-                gameState.SetCurrentGame(levels[index].Elements);
-                gameState.MessageLog.MyLog.Add($"loading {levels[index].Name.ToLower()}...");
-                gameState.ActiveLevel = "2";
-                levels[index + 1].IsAccessable = true;
+                LoadLevel(gameState, levels, index, true);
                 break;
 
             case 2:
-                gameState.SetCurrentGame(levels[index].Elements);
-                gameState.MessageLog.MyLog.Add($"loading {levels[index].Name.ToLower()}...");
-                gameState.ActiveLevel = "3";
+                LoadLevel(gameState, levels, index, false);
                 break;
 
             case 3:
@@ -92,39 +75,47 @@ public abstract class LevelElement
         int leftPos = (Console.WindowWidth - 23) / 2;
         int topPos = (Console.WindowHeight - 10) / 2;
         Console.SetCursorPosition(leftPos, topPos);
-        switch (index)
+        string[] hints =
         {
-            case -1:
-                break;
-            case 0:
-                Console.WriteLine("loading level 1...");
-                Console.SetCursorPosition(leftPos - 8, topPos + 2);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("move around by using the arrow keys");
-                break;
-            case 1:
-                Console.WriteLine("loading level 2...");
-                Console.SetCursorPosition(leftPos - 8, topPos + 2);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("did you know that the ratking has 2 tails?");
-                break;
-            case 2:
-                Console.WriteLine("loading level 3...");
-                Console.SetCursorPosition(leftPos - 8, topPos + 2);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("did you know that you can shoot la[z]er?");
-                break;
-            case 3:
-                Console.WriteLine("generating level...");
-                Console.SetCursorPosition(leftPos - 8, topPos + 2);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("hopefully there are no holes in the wall and");
-                Console.SetCursorPosition(18, 13);
-                Console.Write("no indestructable rocks in the way");
-                break;
+            "move around by using the arrow keys",
+            "did you know that the ratking has 2 tails?",
+            "did you know that you can shoot la[z]er?"
+        };
+
+        if (index >= 0 && index <= 2)
+        {
+            Console.WriteLine($"loading {levels[index].Name.ToLower()} ...");
+            ShowLevelMessage(hints[index], leftPos, topPos);
         }
+        else if (index == 3)
+        {
+            Console.WriteLine("generating level...");
+            ShowLevelMessage("hopefully there are no holes in the wall and", leftPos, topPos);
+            Console.SetCursorPosition(leftPos - 8, topPos + 3);
+            Console.Write("no indestructable rocks in the way");
+        }
+
         Thread.Sleep(4000);
     }
+    public static void ShowLevelMessage(string message, int leftPos, int topPos)
+    {
+        Console.SetCursorPosition(leftPos - 8, topPos + 2);
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(message);
+    }
+
+    public static void LoadLevel(GameState gameState, List<LevelModel> levels, int index, bool unlockNext)
+    {
+        gameState.SetCurrentGame(levels[index].Elements);
+        gameState.MessageLog.MyLog.Add($"loading {levels[index].Name.ToLower()}...");
+        gameState.ActiveLevel = $"{index + 1}";
+
+        if (unlockNext)
+        {
+            levels[index + 1].IsAccessable = true;
+        }
+    }
+
     public void Draw()
     {
         int leftPos = (Console.WindowWidth - 60) / 2;

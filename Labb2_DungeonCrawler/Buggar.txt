@@ -1,0 +1,4 @@
+﻿
+ - När man väljer Load eller continue och sedan vill byta bana är bara level 1 upplåst
+ - Har stängt av esc på Choose level och choose class sålänge, buggade tidigare om man tryckte esc då
+ - Ingen möjlighet att komma tillbaka till huvudmenyn än när man är inne i ett spel

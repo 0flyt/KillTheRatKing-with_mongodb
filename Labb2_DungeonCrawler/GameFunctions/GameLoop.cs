@@ -176,7 +176,7 @@ public static class GameLoop
         var classes = await GetClassesNames();
         var options = classes.Select(c => new MenuOption(c)).ToList();
 
-        int index = MenuHelper.ShowMenu("=== Choose Class ===", options);
+        int index = MenuHelper.ShowMenu("=== Choose Class ===", options, false);
 
         gameState.ClassId = await MongoConnection.MongoConnection.GetClassId(classes[index]);
 
