@@ -38,15 +38,21 @@ public abstract class LevelElement
     {
         return "";
     }
-    public static void LevelChoice(string playerName, GameState gameState)
+    public static void LevelChoice(string playerName, GameState gameState, List<LevelModel> levels)
     {
-        var options = new List<MenuOption>()
+        var options = new List<MenuOption>();
+        for (int i = 0; i < levels.Count; i++)
         {
-            new MenuOption("Level 1"),
-            new MenuOption("Level 2"),
-            new MenuOption("Level 3"),
-            new MenuOption("Generate level")
-        };
+            options.Add(new MenuOption(levels[i].Name, levels[i].IsAccessable));
+        }
+        options.Add(new MenuOption("Generate level"));
+        
+            //{
+        //    new MenuOption("Level 1"),
+        //    new MenuOption("Level 2"),
+        //    new MenuOption("Level 3"),
+        //    new MenuOption("Generate level")
+        //};
         int index = MenuHelper.ShowMenu($"=== {playerName} ===", options);
 
         switch (index)

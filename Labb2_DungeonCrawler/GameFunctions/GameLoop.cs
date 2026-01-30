@@ -18,11 +18,14 @@ public static class GameLoop
 
     public static async Task GameStart()
     {
+        var levelPaths = new List<string>() { "ProjectFiles\\Level1.txt", "ProjectFiles\\Level2.txt", "ProjectFiles\\Level3.txt" };
+        List<LevelModel> levels = LevelModel.LoadLevels(levelPaths);
+        Graphics.WriteTitleScreen();
+        PlayMusicLoop("ProjectFiles\\09. Björn Petersson - Uppenbarelse.wav");
+        Console.ReadKey(true);
+
         while (true)
         {
-            Graphics.WriteTitleScreen();
-            Console.ReadKey(true);
-            PlayMusicLoop("ProjectFiles\\09. Björn Petersson - Uppenbarelse.wav");
             Console.CursorVisible = false;
 
             var saves = await GetSavesPlayerName();
@@ -80,7 +83,7 @@ public static class GameLoop
             }
             else
             {
-                gameState = await StartNewGame();
+                gameState = await StartNewGame(levels);
             }
 
             player = gameState.CurrentState.OfType<Player>().First();
@@ -89,7 +92,7 @@ public static class GameLoop
             
             await SaveToDb(gameState);
 
-            await RunGameLoop(gameState, player);
+            await RunGameLoop(gameState, player, levels);
             await HandlePlayerDeath(player, id, gameState);
         }
     }
@@ -143,13 +146,13 @@ public static class GameLoop
         musicTrack = null;
     }
 
-    private static async Task<GameState> StartNewGame()
+    private static async Task<GameState> StartNewGame(List<LevelModel> levels)
     {
         string PlayerName = Graphics.WriteStartScreen();
         var gameState = new GameState(PlayerName);
         var classChoice = await SelectClass(gameState);
 
-        gameState = SelectLevel(PlayerName, gameState);
+        gameState = SelectLevel(PlayerName, gameState, levels);
 
         var player = gameState.CurrentState?
             .OfType<Player>()
@@ -162,9 +165,9 @@ public static class GameLoop
 
         return gameState;
     }
-    private static GameState SelectLevel(string PlayerName,GameState gameState)
+    private static GameState SelectLevel(string PlayerName,GameState gameState, List<LevelModel> levels)
     {
-        LevelElement.LevelChoice(PlayerName, gameState);
+        LevelElement.LevelChoice(PlayerName, gameState, levels);
         return gameState;
     }
 
@@ -259,7 +262,7 @@ public static class GameLoop
         return player;
     }
 
-    private static async Task RunGameLoop(GameState gameState, Player player)
+    private static async Task RunGameLoop(GameState gameState, Player player, List<LevelModel> levels)
     {
         while (player.HP > 0)
         {
@@ -271,7 +274,7 @@ public static class GameLoop
                 Console.Clear();
                 int hpHold = player.HP;
                 int xpHold = player.XP;
-                gameState = SelectLevel(player.Name, gameState);
+                gameState = SelectLevel(player.Name, gameState, levels);
                 string nameHold = player.Name;
                 string classHold = player.Class;
                 player = gameState.CurrentState?
