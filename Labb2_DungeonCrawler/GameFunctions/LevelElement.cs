@@ -63,12 +63,14 @@ public abstract class LevelElement
                 gameState.SetCurrentGame(LevelData.Load("ProjectFiles\\Level1.txt"));
                 gameState.MessageLog.MyLog.Add("loading level 1...");
                 gameState.ActiveLevel = "1";
+                levels[index + 1].IsAccessable = true;
                 break;
 
             case 1:
                 gameState.SetCurrentGame(LevelData.Load("ProjectFiles\\Level2.txt"));
                 gameState.MessageLog.MyLog.Add("loading level 2...");
                 gameState.ActiveLevel = "2";
+                levels[index + 1].IsAccessable = true;
                 break;
 
             case 2:
