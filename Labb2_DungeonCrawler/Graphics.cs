@@ -139,20 +139,28 @@ public static class Graphics
     {
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.DarkGray;
+        int leftPos;
+        int topPos;
         string gameOver = "game over.";
-        string roundInfo = $"{player.Name} the {player.Class} died a heroic death fighting rats and\nsnakes in {player.TurnsPlayed} turns and gained {player.XP} xp\npress [enter] to accept your faith";
-        Console.SetCursorPosition(15, 10);
+        var roundInfo = new List<string>() { $"{player.Name} the {player.Class} died a heroic death fighting rats and", $"snakes in {player.TurnsPlayed} turns and gained {player.XP} xp", "press [enter] to accept your faith" };
+        leftPos = (Console.WindowWidth - gameOver.Length) / 2;
+        topPos = (Console.WindowHeight - 2) / 2;
+        Console.SetCursorPosition(leftPos, topPos);
         foreach (var item in gameOver)
         {
             Console.Write(item);
             Thread.Sleep(200);
         }
-        Console.SetCursorPosition(0, 12);
         Console.ForegroundColor = ConsoleColor.DarkRed;
-        foreach (var item in roundInfo)
+        leftPos = (Console.WindowWidth - roundInfo[0].Length) / 2;
+        for (int i = 0; i < roundInfo.Count; i++)
         {
-            Console.Write(item);
-            Thread.Sleep(writingSpeed);
+            Console.SetCursorPosition(leftPos, topPos + i + 2);
+            foreach (var item in roundInfo[i])
+            {
+                Console.Write(item);
+                Thread.Sleep(writingSpeed);
+            }
         }
         //return Console.ReadKey(true);
     }
