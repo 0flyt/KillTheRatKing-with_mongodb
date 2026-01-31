@@ -23,68 +23,83 @@ public static class GameLoop
         Graphics.WriteTitleScreen();
         PlayMusicLoop("ProjectFiles\\09. Björn Petersson - Uppenbarelse.wav");
         Console.ReadKey(true);
+        GameState gameState = null;
+        Player player;
+        ObjectId id = ObjectId.Empty;
 
         while (true)
         {
-            Console.CursorVisible = false;
+            do
+            {
+                Console.CursorVisible = false;
 
-            var saves = await GetSavesPlayerName();
-            bool hasSaves = saves.Any();
+                var saves = await GetSavesPlayerName();
+                bool hasSaves = saves.Any();
        
-            var mainMenuOptions = new List<MenuOption>
-            {
-                new MenuOption("Continue", hasSaves),
-                new MenuOption("Load Save", hasSaves),
-                new MenuOption("New Game"),
-                new MenuOption("High Score")
-            };
-            int mainChoice = MenuHelper.ShowMenu("=== Main Menu ===", mainMenuOptions);
+                var mainMenuOptions = new List<MenuOption>
+                {
+                    new MenuOption("Continue", hasSaves),
+                    new MenuOption("Load Save", hasSaves),
+                    new MenuOption("New Game"),
+                    new MenuOption("High Score")
+                };
+                int mainChoice = MenuHelper.ShowMenu("=== Main Menu ===", mainMenuOptions);
 
-            ObjectId id = ObjectId.Empty;
 
-            switch (mainChoice)
-            {
-                case -1: continue;
+                switch (mainChoice)
+                {
+                    case -1: continue;
 
-                case 0:
-                    if (!hasSaves)
-                    {
-                        Console.Clear();
-                        Console.WriteLine("No save!");
-                        Console.ReadKey(true);
-                        continue;
-                    }
-                    id = saves.First().Id;
-                    break;
+                    case 0:
+                        if (!hasSaves)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("No save!");
+                            Console.ReadKey(true);
+                            continue;
+                        }
+                        id = saves.First().Id;
+                        break;
 
-                case 1:
-                    var selectedSave = await SelectSaveFromList();
-                    if (selectedSave == null) continue;
-                    id = selectedSave.Id;
-                    break;
+                    case 1:
+                        var selectedSave = await SelectSaveFromList();
+                        if (selectedSave == null) continue;
+                        id = selectedSave.Id;
+                        if(int.TryParse(selectedSave.AktiveLevelName, out int result))
+                        {
+                            for (global::System.Int32 i = 0; i < result; i++)
+                            {
+                                levels[i].IsAccessable = true;
+                            }
+                            if(result == levels.Count -1)
+                            {
+                                levels[result].IsAccessable = true;
+                            }
+                        }
+                        break;
                     
-                case 2:
-                    id = ObjectId.Empty;
-                    break;
+                    case 2:
+                        id = ObjectId.Empty;
+                        break;
 
-                case 3:
-                    await ShowHighScore();
-                    continue;
+                    case 3:
+                        await ShowHighScore();
+                        continue;
 
-                default:
-                    continue;
-            }
+                    default:
+                        continue;
+                }
 
-            GameState gameState;
-            Player player;
-            if (id != ObjectId.Empty)
-            {
-                gameState = await LoadGame(id);
+                if (id != ObjectId.Empty)
+                {
+                    gameState = await LoadGame(id);
+                }
+                else
+                {
+                    gameState = await StartNewGame(levels);
+                }
             }
-            else
-            {
-                gameState = await StartNewGame(levels);
-            }
+            while (gameState == null);
 
             player = gameState.CurrentState.OfType<Player>().First();
 
@@ -92,7 +107,11 @@ public static class GameLoop
             
             await SaveToDb(gameState);
 
-            await RunGameLoop(gameState, player, levels);
+            bool continueGame = await RunGameLoop(gameState, player, levels);
+            if (!continueGame)
+            {
+                continue;
+            }
             await HandlePlayerDeath(player, id, gameState);
         }
     }
@@ -154,6 +173,10 @@ public static class GameLoop
 
         gameState = SelectLevel(PlayerName, gameState, levels);
 
+        if (gameState == null)
+        {
+            return null!;
+        }
         var player = gameState.CurrentState?
             .OfType<Player>()
             .FirstOrDefault()
@@ -167,8 +190,7 @@ public static class GameLoop
     }
     private static GameState SelectLevel(string PlayerName,GameState gameState, List<LevelModel> levels)
     {
-        LevelElement.LevelChoice(PlayerName, gameState, levels);
-        return gameState;
+        return LevelElement.LevelChoice(PlayerName, gameState, levels) ? gameState : null;
     }
 
     private static async Task<string> SelectClass(GameState gameState)
@@ -262,7 +284,7 @@ public static class GameLoop
         return player;
     }
 
-    private static async Task RunGameLoop(GameState gameState, Player player, List<LevelModel> levels)
+    private static async Task<bool> RunGameLoop(GameState gameState, Player player, List<LevelModel> levels)
     {
         while (player.HP > 0)
         {
@@ -277,6 +299,10 @@ public static class GameLoop
                 gameState = SelectLevel(player.Name, gameState, levels);
                 string nameHold = player.Name;
                 string classHold = player.Class;
+                if(gameState == null)
+                {
+                    return false;
+                }
                 player = gameState.CurrentState?
                     .OfType<Player>()
                     .FirstOrDefault()
@@ -286,6 +312,7 @@ public static class GameLoop
                 player.XP = xpHold;
                 player.HP = hpHold;
                 player = InitGame(gameState);
+                continue;
             }
 
             if (menuChoice.Key == ConsoleKey.L)
@@ -308,6 +335,7 @@ public static class GameLoop
                 await SaveToDb(gameState);
             }
         };
+        return true;
     }
 
     private static async Task SaveToDb(GameState gameState)

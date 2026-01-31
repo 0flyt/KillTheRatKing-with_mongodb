@@ -38,7 +38,7 @@ public abstract class LevelElement
     {
         return "";
     }
-    public static void LevelChoice(string playerName, GameState gameState, List<LevelModel> levels)
+    public static bool LevelChoice(string playerName, GameState gameState, List<LevelModel> levels)
     {
         var options = new List<MenuOption>();
         for (int i = 0; i < levels.Count; i++)
@@ -46,29 +46,55 @@ public abstract class LevelElement
             options.Add(new MenuOption(levels[i].Name, levels[i].IsAccessable));
         }
         options.Add(new MenuOption("Generate level"));
+        options.Add(new MenuOption("Main menu"));
 
         int index = MenuHelper.ShowMenu($"=== {playerName} ===", options, false);
+
+        int generateIndex = levels.Count;
+        int backIndex = levels.Count + 1;
 
         switch (index)
         {
             case -1:
-                break;
-            case 0:
-            case 1:
-                LoadLevel(gameState, levels, index, true);
+                return false;
+
+            case int i when i >= 0 && i < levels.Count:
+                bool unlockNext = i < levels.Count - 1;
+                LoadLevel(gameState, levels, i, unlockNext);
                 break;
 
-            case 2:
-                LoadLevel(gameState, levels, index, false);
-                break;
-
-            case 3:
+            case var i when i == generateIndex:
                 gameState.SetCurrentGame(LevelData.Load(RandomMap.GenerateMap()));
                 gameState.MessageLog.MyLog.Add("generating a random level...");
                 gameState.ActiveLevel = "*randomly generated map*";
                 break;
 
+            case var i when i == backIndex:
+                return false;
+            default:
+                return false;
         }
+
+        //switch (index)
+        //{
+        //    case -1:
+        //        break;
+        //    case 0:
+        //    case 1:
+        //        LoadLevel(gameState, levels, index, true);
+        //        break;
+
+        //    case 2:
+        //        LoadLevel(gameState, levels, index, false);
+        //        break;
+
+        //    case 3:
+        //        gameState.SetCurrentGame(LevelData.Load(RandomMap.GenerateMap()));
+        //        gameState.MessageLog.MyLog.Add("generating a random level...");
+        //        gameState.ActiveLevel = "*randomly generated map*";
+        //        break;
+
+        //}
         Thread.Sleep(500);
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Green;
@@ -96,6 +122,7 @@ public abstract class LevelElement
         }
 
         Thread.Sleep(4000);
+        return true;
     }
     public static void ShowLevelMessage(string message, int leftPos, int topPos)
     {

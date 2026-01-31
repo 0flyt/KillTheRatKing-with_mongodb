@@ -125,6 +125,7 @@ namespace Labb2_DungeonCrawler.MongoConnection
                                 AktiveLevelName = g.ActiveLevel,
                                 CreatedAt = g.CreatedDateTime
                             })
+                            .SortByDescending(s => s.CreatedDateTime)
                             .ToListAsync();
         }
         public static async Task<List<string>> GetClassesFromDB()
