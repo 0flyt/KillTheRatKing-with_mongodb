@@ -171,6 +171,22 @@ public abstract class LevelElement
                !Game.CurrentState.Any(k => k != this && k.yCordinate == targetSpace.YCord && k.xCordinate == targetSpace.XCord);
     }
 
+    private static void WriteCentered(string message, int row)
+    {
+        int windowWidth = Console.WindowWidth;
+
+        if (message.Length > windowWidth)
+            message = message.Substring(0, windowWidth);
+
+        int leftPos = Math.Max(0, (windowWidth - message.Length) / 2);
+
+        Console.SetCursorPosition(0, row);
+        Console.Write(new string(' ', windowWidth));
+
+        Console.SetCursorPosition(leftPos, row);
+        Console.Write(message);
+    }
+
     public void CollideAndConcequences(Player player)
     {
         var collider = GetCollider();
@@ -180,20 +196,25 @@ public abstract class LevelElement
         {
 
             message = PrintFightresult(Fight(collider), collider, player);
-            leftPos = (Console.WindowWidth - message.Length) / 2;
-            Console.SetCursorPosition(0, 1);
-            Console.Write(new string(' ', Console.WindowWidth));
-            Console.SetCursorPosition(leftPos, 1);
-            Console.WriteLine(message);
+
+            //leftPos = (Console.WindowWidth - message.Length) / 2;
+            //Console.SetCursorPosition(0, 1);
+            //Console.Write(new string(' ', Console.WindowWidth));
+            //Console.SetCursorPosition(leftPos, 1);
+            //Console.WriteLine(message);
+
+            WriteCentered(message, 1);
 
             if (collider.HP > 0)
             {
                 message = collider.PrintFightresult(collider.Fight(this), this, player);
-                leftPos = (Console.WindowWidth - message.Length) / 2;
-                Console.SetCursorPosition(0, 2);
-                Console.Write(new string(' ', Console.WindowWidth));
-                Console.SetCursorPosition(leftPos, 2);
-                Console.WriteLine(message);
+                //leftPos = (Console.WindowWidth - message.Length) / 2;
+                //Console.SetCursorPosition(0, 2);
+                //Console.Write(new string(' ', Console.WindowWidth));
+                //Console.SetCursorPosition(leftPos, 2);
+                //Console.WriteLine(message);
+
+                WriteCentered(message, 2);
             }
 
             Game.MessageLog.MyLog.Add(PrintUnitInfo());
