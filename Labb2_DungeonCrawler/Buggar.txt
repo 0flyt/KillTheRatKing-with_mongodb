@@ -1,2 +1,2 @@
 ﻿
- - Har stängt av esc på choose class sålänge, buggade tidigare om man tryckte esc då
+ - Har stängt av esc på choose class sålänge, buggade tidigare om man tryckte esc då.
